@@ -3,9 +3,7 @@
   lib,
   pkgs,
   ...
-}: let
-  secrets = import ./secrets.nix;
-in {
+}: {
   imports = [
     ./hardware-configuration.nix
   ];
@@ -208,7 +206,7 @@ in {
       RestartSec = "30";
       ExecStart = "${pkgs.writeShellScript "bluetooth-auto-connect" ''
         while true; do
-          ${pkgs.bluez}/bin/bluetoothctl connect ${secrets.bluetoothHeadsetMAC}
+          ${pkgs.bluez}/bin/bluetoothctl connect 80:99:E7:99:A0:FD
           sleep 1
         done
       ''}";

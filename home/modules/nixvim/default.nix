@@ -642,7 +642,7 @@
       {
         mode = "n";
         key = "<leader>ba";
-        action = "<%bd|e#|bd#<CR>";
+        action = "<cmd>%bd|e#|bd#<CR>";
         options = {
           desc = "Delete all buffers except current";
           silent = true;
