@@ -1,168 +1,84 @@
 /* Gruvbox Dark Theme for Ghostty Tab Bar */
-/* Based on Gruvbox color scheme by morhetz */
-
-/* Aggressively remove all padding/margin/spacing */
-* {
-  margin: 0 !important;
-  padding: 0 !important;
-}
-
-window {
-  padding: 0 !important;
-  margin: 0 !important;
-}
-
-notebook {
-  padding: 0 !important;
-  margin: 0 !important;
-}
-
-notebook header {
-  padding: 0 !important;
-  margin: 0 !important;
-  min-height: 28px !important;
-  max-height: 28px !important;
-}
-
-notebook > header {
-  padding: 0 !important;
-  margin: 0 !important;
-  min-height: 28px !important;
-  max-height: 28px !important;
-}
-
-headerbar {
-  padding: 0 !important;
-  margin: 0 !important;
-  min-height: 0 !important;
-  max-height: 0 !important;
-}
 
 tabbar {
   background-color: #282828;
-  padding: 0 !important;
-  margin: 0 !important;
   border: none;
-  height: 28px !important;
-  min-height: 28px !important;
-  max-height: 28px !important;
-  overflow: hidden !important;
 }
 
 tabbar tabbox {
   background-color: #282828;
   font-family: "JetBrains Mono", "Fira Code", monospace;
-  font-weight: 700;  /* Medium */
-  font-size: 18px;
+  font-size: 13px;
   border: none;
-  padding: 0 !important;
-  margin: 0 !important;
-  height: 28px !important;
-  min-height: 28px !important;
-  max-height: 28px !important;
-  overflow: hidden !important;
 }
 
-/* Individual tab styling */
+/* Inactive tabs */
 tabbar tabbox tab {
-  background-color: #689d6a;
-  color: #282828;
+  background-color: #3c3836;
+  color: #a89984;
   border: none;
-  border-right: 1px solid #504945;
-  padding: 0 12px !important;
-  margin: 0 !important;
-  width: 200px !important;
-  min-width: 200px !important;
-  max-width: 200px !important;
-  flex: 0 0 200px !important;
-  flex-grow: 0 !important;
-  flex-shrink: 0 !important;
-  height: 28px !important;
-  min-height: 28px !important;
-  max-height: 28px !important;
-  transition: none;
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  overflow: hidden !important;
+  border-radius: 6px 6px 0 0;
+  margin: 4px 2px 0 2px;
+  padding: 0 12px;
 }
 
-/* Tab hover effect */
+/* Tab hover */
 tabbar tabbox tab:hover:not(:selected) {
-  background-color: #d5c4a1;
-  color: #504945;
+  background-color: #504945;
+  color: #ebdbb2;
 }
 
-/* Tab label text */
+/* Active tab */
+tabbar tabbox tab:selected {
+  background-color: #928374;
+  color: #282828;
+  font-weight: 600;
+}
+
+tabbar tabbox tab:selected label {
+  font-weight: 600;
+  color: #282828;
+}
+
+
+/* Tab labels */
 tabbar tabbox tab label {
-  font-size: 18px;
-  font-weight: normal;
-  text-shadow: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  align-items: center;
+  font-size: 13px;
 }
 
-/* Close button styling */
+
+/* Close button */
 tabbar tabbox tab button {
   background: transparent;
   border: none;
   color: #665c54;
-  font-size: 14px;
-  padding: 2px;
-  margin: 0 0 0 6px;
-  border-radius: 2px;
-  opacity: 0.6;
-  transition: none;
+  border-radius: 4px;
+  opacity: 0;
   min-width: 0;
   min-height: 0;
 }
 
-/* Close button hover */
+tabbar tabbox tab:hover button {
+  opacity: 0.7;
+}
+
 tabbar tabbox tab button:hover {
   background-color: #cc241d;
   color: #ebdbb2;
   opacity: 1;
 }
 
-/* Active/selected tab - subtle pill style */
-tabbar tabbox tab:selected {
-  background-color: #83a598;
-  color: #504945;
-  font-weight: 600;
-  border-radius: 4px;
-  margin: 2px;
-  padding: 0 10px;
-  min-height: 28px;
-}
-
-/* Active tab label */
-tabbar tabbox tab:selected label {
-  font-weight: 600;
-  color: #504945;
-}
-
-/* Active tab close button */
-tabbar tabbox tab:selected button {
-  color: #a89984;
-  opacity: 0.8;
-}
-
-/* New tab button if present */
+/* New tab button */
 tabbar button {
-  background-color: #a89984;
-  color: #282828;
+  background-color: transparent;
+  color: #a89984;
   border: none;
-  padding: 6px 12px;
-  margin: 0;
-  font-size: 16px;
-  border-radius: 0;
+  border-radius: 4px;
   min-width: 0;
   min-height: 0;
 }
 
 tabbar button:hover {
-  background-color: #d5c4a1;
-  color: #504945;
+  background-color: #504945;
+  color: #ebdbb2;
 }
