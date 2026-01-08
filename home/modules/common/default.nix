@@ -1,21 +1,22 @@
 {
   pkgs,
   inputs,
-  ...  }: let
-    zen-browser-wrapped = pkgs.symlinkJoin {
-      name = "zen-browser-wrapped";
-      paths = [inputs.zen-browser.packages.${pkgs.system}.twilight];
-      buildInputs = [pkgs.makeWrapper];
-      postBuild = ''
-        wrapProgram $out/bin/zen \
-          --prefix LD_LIBRARY_PATH : "${pkgs.lib.makeLibraryPath [
-          pkgs.pipewire
-          pkgs.pulseaudio
-          pkgs.alsa-lib
-          pkgs.ffmpeg
-        ]}"
-      '';
-    };
+  ...
+}: let
+  zen-browser-wrapped = pkgs.symlinkJoin {
+    name = "zen-browser-wrapped";
+    paths = [inputs.zen-browser.packages.${pkgs.system}.twilight];
+    buildInputs = [pkgs.makeWrapper];
+    postBuild = ''
+      wrapProgram $out/bin/zen \
+        --prefix LD_LIBRARY_PATH : "${pkgs.lib.makeLibraryPath [
+        pkgs.pipewire
+        pkgs.pulseaudio
+        pkgs.alsa-lib
+        pkgs.ffmpeg
+      ]}"
+    '';
+  };
 in {
   home.packages =
     (with pkgs; [
@@ -52,7 +53,10 @@ in {
       libreoffice
       wl-clipboard
       wtype
-      (rust-bin.stable."1.91.0".default.override {    extensions = ["rust-src" "rust-analyzer"];    targets = ["x86_64-unknown-linux-gnu"];  })
+      (rust-bin.stable."1.91.0".default.override {
+        extensions = ["rust-src" "rust-analyzer"];
+        targets = ["x86_64-unknown-linux-gnu"];
+      })
       ncspot
       glab
       pdftk
@@ -70,7 +74,7 @@ in {
       alsa-utils
       nixos-generators
       slurp
-      (python3.withPackages (ps:    with ps; [      rembg    ]))
+      (python3.withPackages (ps: with ps; [rembg]))
       claude-code
       playerctl
       hyprshot
@@ -123,7 +127,8 @@ in {
 
       # Python package management
       uv
-    ])    ++ [
+    ])
+    ++ [
       # Zig from overlay (latest stable release)
       inputs.zig.packages.${pkgs.system}.default
       # ZLS from unstable (latest available version)

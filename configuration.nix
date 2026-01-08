@@ -79,7 +79,7 @@
   };
 
   hardware.graphics.enable = true;
-  
+
   # Enable WiFi support
   hardware.wirelessRegulatoryDatabase = true;
   hardware.enableRedistributableFirmware = true;
@@ -179,7 +179,7 @@
       Type = "simple";
       Restart = "always";
       RestartSec = "5";
-      ExecStart = "${pkgs.sing-box}/bin/sing-box run -c /home/misha/sing-box/main.json";
+      ExecStart = "${pkgs.sing-box}/bin/sing-box run -c /home/misha/sing-box/plati-grpc.json";
       User = "root";
       Group = "root";
     };
