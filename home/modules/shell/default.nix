@@ -350,6 +350,7 @@
       app-notifications = "no-clipboard-copy";
       working-directory = "home";
       background-opacity = 1;
+      gtk-wide-tabs = false;
       shell-integration = "fish";
       cursor-color = "#458588";
       copy-on-select = "clipboard";
@@ -367,18 +368,11 @@
         "ctrl+enter=ignore"
 
         # Tab management (replaces Zellij tabs)
-        "ctrl+k=next_tab" # Next tab
-        "ctrl+s=previous_tab" # Previous tab
-        "ctrl+n=new_tab" # New tab
+        "alt+right=next_tab" # Next tab
+        "alt+left=previous_tab" # Previous tab
+        "alt+4=new_tab" # New tab
 
-        "ctrl+q=close_surface" # Close pane -> Close split
-
-        # Split management
-        "super+alt+v=new_split:right" # Create vertical split
-
-        # Split navigation
-        "super+alt+left=goto_split:left" # Navigate left
-        "super+alt+right=goto_split:right" # Navigate right
+        "alt+5=close_tab" # Close tab
       ];
     };
   };

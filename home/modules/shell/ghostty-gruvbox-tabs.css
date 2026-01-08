@@ -52,6 +52,7 @@ tabbar {
 tabbar tabbox {
   background-color: #282828;
   font-family: "JetBrains Mono", "Fira Code", monospace;
+  font-weight: 700;  /* Medium */
   font-size: 18px;
   border: none;
   padding: 0 !important;
@@ -64,13 +65,18 @@ tabbar tabbox {
 
 /* Individual tab styling */
 tabbar tabbox tab {
-  background-color: #282828;
-  color: #8ec07c;
+  background-color: #689d6a;
+  color: #282828;
   border: none;
   border-right: 1px solid #504945;
   padding: 0 12px !important;
   margin: 0 !important;
-  min-width: 120px;
+  width: 200px !important;
+  min-width: 200px !important;
+  max-width: 200px !important;
+  flex: 0 0 200px !important;
+  flex-grow: 0 !important;
+  flex-shrink: 0 !important;
   height: 28px !important;
   min-height: 28px !important;
   max-height: 28px !important;
@@ -83,8 +89,8 @@ tabbar tabbox tab {
 
 /* Tab hover effect */
 tabbar tabbox tab:hover:not(:selected) {
-  background-color: #504945;
-  color: #d5c4a1;
+  background-color: #d5c4a1;
+  color: #504945;
 }
 
 /* Tab label text */
@@ -122,8 +128,8 @@ tabbar tabbox tab button:hover {
 
 /* Active/selected tab - subtle pill style */
 tabbar tabbox tab:selected {
-  background-color: #504945;
-  color: #83a598;
+  background-color: #83a598;
+  color: #504945;
   font-weight: 600;
   border-radius: 4px;
   margin: 2px;
@@ -134,7 +140,7 @@ tabbar tabbox tab:selected {
 /* Active tab label */
 tabbar tabbox tab:selected label {
   font-weight: 600;
-  color: #83a598;
+  color: #504945;
 }
 
 /* Active tab close button */
@@ -145,8 +151,8 @@ tabbar tabbox tab:selected button {
 
 /* New tab button if present */
 tabbar button {
-  background-color: #282828;
-  color: #a89984;
+  background-color: #a89984;
+  color: #282828;
   border: none;
   padding: 6px 12px;
   margin: 0;
@@ -157,6 +163,6 @@ tabbar button {
 }
 
 tabbar button:hover {
-  background-color: #504945;
-  color: #d5c4a1;
+  background-color: #d5c4a1;
+  color: #504945;
 }
