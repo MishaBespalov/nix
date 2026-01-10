@@ -192,6 +192,67 @@
       echo "🔗 Git repository initialized with initial commit"
     '';
 
+    # Automated Rust workspace creation with full setup
+    functions.rust-new-workspace.body = ''
+      set workspace_name $argv[1]
+      set crates $argv[2..-1]
+
+      if test -z "$workspace_name"
+        echo "Usage: rust-new-workspace <workspace-name> [crate1] [crate2] ..."
+        echo "Example: rust-new-workspace myproject common agent api"
+        return 1
+      end
+
+      echo "🦀 Creating Rust workspace: $workspace_name"
+
+      # Create the workspace from template
+      if not nix flake new -t /home/misha/nixos-dotfiles#rust "$workspace_name"
+        echo "❌ Failed to create project from template"
+        return 1
+      end
+
+      # Navigate to workspace directory
+      cd "$workspace_name"
+
+      # Create workspace Cargo.toml
+      echo "📦 Creating workspace Cargo.toml..."
+      echo '[workspace]' > Cargo.toml
+      echo 'resolver = "2"' >> Cargo.toml
+      echo 'members = ["crates/*"]' >> Cargo.toml
+
+      # Create .envrc for direnv
+      echo "🔧 Setting up direnv..."
+      echo "use flake" > .envrc
+
+      # Create crates directory
+      mkdir -p crates
+
+      # Create each crate
+      if test (count $crates) -gt 0
+        for crate in $crates
+          echo "📦 Creating crate: $crate"
+          cargo new "crates/$crate" --lib
+        end
+      end
+
+      # Initialize git repository
+      echo "📦 Initializing git repository..."
+      git init -b main
+      git add .
+      git commit -m "Initial commit: Rust workspace setup"
+
+      # Automatically allow direnv
+      echo "🔒 Allowing direnv..."
+      direnv allow
+
+      echo "✅ Workspace '$workspace_name' ready! Environment activated."
+      if test (count $crates) -gt 0
+        echo "📦 Created crates: $crates"
+      end
+      echo "💡 Add more crates with: cargo new crates/<name> --lib"
+      echo "🔗 Git repository initialized with initial commit"
+    '';
+
     # Automated Go project creation with full setup
     functions.go-new.body = ''
             set project_name $argv[1]

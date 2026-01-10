@@ -53,10 +53,11 @@ in {
       libreoffice
       wl-clipboard
       wtype
-      (rust-bin.stable."1.91.0".default.override {
-        extensions = ["rust-src" "rust-analyzer"];
+      (rust-bin.nightly.latest.default.override {
+        extensions = ["rust-src" "rust-analyzer" "miri"];
         targets = ["x86_64-unknown-linux-gnu"];
       })
+      cargo-generate
       ncspot
       glab
       pdftk
@@ -69,6 +70,7 @@ in {
       pkg-config
       grim
       beep
+      hiddify-app
       traceroute
       awscli2
       alsa-utils

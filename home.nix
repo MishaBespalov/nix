@@ -20,3 +20,4 @@
   home.homeDirectory = "/home/misha";
   home.stateVersion = "25.05";
 }
+

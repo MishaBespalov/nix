@@ -3,7 +3,79 @@
   lib,
   pkgs,
   ...
-}: {
+}: let
+  throne = pkgs.stdenv.mkDerivation rec {
+    pname = "throne";
+    version = "1.0.13";
+
+    src = pkgs.fetchurl {
+      url = "https://github.com/throneproj/Throne/releases/download/${version}/Throne-${version}-linux-amd64.zip";
+      sha256 = "0pb9ds6xhkm8b0ldpk9537j4b7xic66phkcd2p61s89pkxs7zc03";
+    };
+
+    nativeBuildInputs = with pkgs; [
+      unzip
+      autoPatchelfHook
+      qt6.wrapQtAppsHook
+      makeWrapper
+    ];
+
+    buildInputs = with pkgs; [
+      qt6.qtbase
+      qt6.qtsvg
+      qt6.qtwayland
+      libGL
+      fontconfig
+      freetype
+      xorg.libX11
+      xorg.libxcb
+      libxkbcommon
+      stdenv.cc.cc.lib
+      gtk3
+      pango
+      cairo
+      gdk-pixbuf
+      atk
+      openssl
+    ];
+
+    unpackPhase = ''
+      unzip $src
+    '';
+
+    installPhase = ''
+            mkdir -p $out/bin $out/share/throne
+            cp -r Throne/* $out/share/throne/
+            chmod +x $out/share/throne/Throne
+
+            cat > $out/bin/throne <<WRAPPER
+      #!/bin/sh
+      DATA_DIR="\$HOME/.local/share/throne"
+      STORE_DIR="$out/share/throne"
+
+      # Copy app to writable location if not present or outdated
+      if [ ! -f "\$DATA_DIR/Throne" ] || [ "\$STORE_DIR/Throne" -nt "\$DATA_DIR/Throne" ]; then
+          mkdir -p "\$DATA_DIR"
+          cp -r "\$STORE_DIR"/* "\$DATA_DIR"/
+          chmod -R u+w "\$DATA_DIR"
+      fi
+
+      cd "\$DATA_DIR"
+      export LD_LIBRARY_PATH="${pkgs.openssl.out}/lib:\$LD_LIBRARY_PATH"
+      export SHELL=/run/current-system/sw/bin/bash
+      exec "\$DATA_DIR/Throne" "\$@"
+      WRAPPER
+            chmod +x $out/bin/throne
+    '';
+
+    meta = with lib; {
+      description = "Cross-platform GUI proxy utility (Nekoray fork)";
+      homepage = "https://github.com/throneproj/Throne";
+      license = licenses.gpl3;
+      platforms = ["x86_64-linux"];
+    };
+  };
+in {
   imports = [
     ./hardware-configuration.nix
   ];
@@ -179,7 +251,7 @@
       Type = "simple";
       Restart = "always";
       RestartSec = "5";
-      ExecStart = "${pkgs.sing-box}/bin/sing-box run -c /home/misha/sing-box/plati-grpc.json";
+      ExecStart = "${pkgs.sing-box}/bin/sing-box run -c /home/misha/sing-box/main.json";
       User = "root";
       Group = "root";
     };
@@ -189,6 +261,16 @@
   programs.fish.enable = true;
   programs.direnv.enable = true;
   security.polkit.enable = true;
+
+  # Polkit rule for Throne TUN mode
+  security.polkit.extraConfig = ''
+    polkit.addRule(function(action, subject) {
+      if (action.id == "org.freedesktop.policykit.exec" &&
+          subject.isInGroup("wheel")) {
+        return polkit.Result.YES;
+      }
+    });
+  '';
   security.sudo.wheelNeedsPassword = false;
 
   # Enable ssh-agent system service
@@ -223,6 +305,9 @@
     wl-clipboard
     docker-compose
     qemu
+    typst
+    hiddify-app
+    throne
   ];
 
   fonts.packages = with pkgs; [
