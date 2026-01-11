@@ -414,7 +414,7 @@
         key = "<leader>sf";
         action.__raw = ''
           function()
-            local root = project_root()
+            local root = _G.project_root()
             require("fzf-lua").files({ cwd = root })
           end
         '';
