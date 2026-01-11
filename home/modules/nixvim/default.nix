@@ -412,9 +412,14 @@
       {
         mode = "n";
         key = "<leader>sf";
-        action = "<cmd>FzfLua files<CR>";
+        action.__raw = ''
+          function()
+            local root = project_root()
+            require("fzf-lua").files({ cwd = root })
+          end
+        '';
         options = {
-          desc = "Find files in project";
+          desc = "Find files in project (git root)";
           silent = true;
         };
       }
@@ -716,13 +721,12 @@
                    })
 
                   vim.deprecate = function() end
-                  local function project_root()
+                  _G.project_root = function()
                     local buf = vim.api.nvim_get_current_buf()
                     local name = vim.api.nvim_buf_get_name(buf)
                     local start = (name ~= "" and vim.fs.dirname(name)) or vim.loop.cwd()
-                    local root_markers = { ".git", "go.work", "go.mod", "pyproject.toml",
-                                           "package.json", "Cargo.toml", "Makefile" }
-                    local found = vim.fs.find(root_markers, { path = start, upward = true })[1]
+                    -- Only use .git as project root marker
+                    local found = vim.fs.find(".git", { path = start, upward = true })[1]
                     return found and vim.fs.dirname(found) or start
                   end
 
