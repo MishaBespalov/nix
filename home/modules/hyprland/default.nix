@@ -44,7 +44,7 @@
       ];
       input = {
         kb_layout = "us,ru";
-        kb_options = "grp:caps_toggle";
+        kb_options = "grp:caps_toggle,grp:shift_caps_toggle";
         kb_variant = "";
         kb_model = "pc105";
 

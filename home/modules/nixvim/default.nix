@@ -142,7 +142,7 @@
         settings = {
           defaults = {
             formatter = "path.filename_first";
-            file_ignore_patterns = [ ".git/" "node_modules/" ];
+            file_ignore_patterns = [".git/" "node_modules/"];
           };
           files = {
             prompt = "Files❯ ";
@@ -227,6 +227,24 @@
       dressing.enable = true; # nicer vim.ui.select/input
       notify.enable = false; # notifications
       noice.enable = true; # commandline/LSP UIs
+      zen-mode = {
+        enable = false;
+        settings = {
+          window = {
+            width = 120;
+            options = {
+              number = false;
+              relativenumber = false;
+              signcolumn = "no";
+              cursorline = false;
+            };
+          };
+          plugins = {
+            gitsigns = {enabled = false;};
+            tmux = {enabled = true;};
+          };
+        };
+      };
 
       diffview.enable = true;
       git-conflict.enable = true;
@@ -249,8 +267,13 @@
             yaml = ["prettier"];
             json = ["prettier"];
             zig = ["zigfmt"]; # uses zig fmt
-            rust = ["rustfmt"]; # uses cargo fmt
+            rust = ["rustfmt"];
             dockerfile = ["hadolint"];
+          };
+          formatters = {
+            rustfmt = {
+              prepend_args = ["--config-path" "/home/misha/.config/rustfmt/rustfmt.toml"];
+            };
           };
         };
       };
@@ -619,6 +642,15 @@
         action = "<cmd>LazyGit<CR>";
         options = {
           desc = "Open LazyGit";
+          silent = true;
+        };
+      }
+      {
+        mode = "n";
+        key = "<leader>z";
+        action = "<cmd>ZenMode<CR>";
+        options = {
+          desc = "Toggle Zen Mode";
           silent = true;
         };
       }

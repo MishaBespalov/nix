@@ -147,4 +147,9 @@ in {
     PATH = "$HOME/.local/bin:$HOME/.local/npm-global/bin:$HOME/.cargo/bin:$PATH";
     SSH_AUTH_SOCK = "$XDG_RUNTIME_DIR/ssh-agent";
   };
+
+  xdg.configFile."rustfmt/rustfmt.toml".text = ''
+    unstable_features = true
+    chain_width = 40
+  '';
 }
