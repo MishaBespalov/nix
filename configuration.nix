@@ -75,6 +75,78 @@
       platforms = ["x86_64-linux"];
     };
   };
+  happ = pkgs.stdenv.mkDerivation rec {
+    pname = "happ";
+    version = "2.0.0";
+
+    src = pkgs.fetchurl {
+      url = "https://github.com/Happ-proxy/happ-desktop/releases/download/${version}/Happ.linux.x64.deb";
+      sha256 = "0x0d5dl144mlwdcrl4kl2wc1ivy6y4g5lbvhdqf0dvhsf6635x05";
+    };
+
+    nativeBuildInputs = with pkgs; [
+      dpkg
+      autoPatchelfHook
+      makeWrapper
+      qt6.wrapQtAppsHook
+    ];
+
+    buildInputs = with pkgs; [
+      glib
+      nss
+      nspr
+      atk
+      cups
+      dbus
+      gtk3
+      pango
+      cairo
+      gdk-pixbuf
+      xorg.libX11
+      xorg.libXcomposite
+      xorg.libXdamage
+      xorg.libXext
+      xorg.libXfixes
+      xorg.libXrandr
+      xorg.libxcb
+      libxkbcommon
+      mesa
+      expat
+      alsa-lib
+      stdenv.cc.cc.lib
+      libdrm
+      libGL
+      # Additional dependencies for bundled libraries
+      e2fsprogs
+      libgpg-error
+      libgcrypt
+      krb5
+      qt6.qtwayland
+      openssl
+    ];
+
+    unpackPhase = ''
+      dpkg-deb -x $src .
+    '';
+
+    installPhase = ''
+      mkdir -p $out/bin $out/opt/happ
+      cp -r opt/happ/* $out/opt/happ/
+      cp -r usr/share $out/ 2>/dev/null || true
+
+      # Create wrapper that sets up library paths
+      makeWrapper $out/opt/happ/bin/Happ $out/bin/happ \
+        --prefix LD_LIBRARY_PATH : "$out/opt/happ/lib:${pkgs.lib.makeLibraryPath buildInputs}" \
+        --set QT_PLUGIN_PATH "$out/opt/happ/plugins" \
+        --set QML2_IMPORT_PATH "$out/opt/happ/qml"
+    '';
+
+    meta = with lib; {
+      description = "Happ VPN desktop client";
+      homepage = "https://github.com/Happ-proxy/happ-desktop";
+      platforms = ["x86_64-linux"];
+    };
+  };
 in {
   imports = [
     ./hardware-configuration.nix
@@ -257,6 +329,24 @@ in {
   #   };
   # };
 
+  # Happ VPN daemon
+  systemd.services.happd = {
+    description = "Happ Process Control Daemon";
+    after = ["network.target"];
+    wantedBy = ["multi-user.target"];
+    serviceConfig = {
+      Type = "simple";
+      User = "root";
+      Group = "root";
+      ExecStart = "${happ}/opt/happ/bin/happd";
+      Restart = "on-failure";
+      RestartSec = "5s";
+      TimeoutStopSec = "10s";
+      KillMode = "mixed";
+      KillSignal = "SIGTERM";
+    };
+  };
+
   programs.hyprland.enable = true;
   programs.fish.enable = true;
   programs.direnv.enable = true;
@@ -308,6 +398,7 @@ in {
     typst
     hiddify-app
     throne
+    happ
   ];
 
   fonts.packages = with pkgs; [

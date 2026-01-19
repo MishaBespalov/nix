@@ -1,0 +1,84 @@
+/* Ayu Dark Theme for Ghostty Tab Bar */
+
+tabbar {
+  background-color: #0F1419;
+  border: none;
+}
+
+tabbar tabbox {
+  background-color: #0F1419;
+  font-family: "JetBrains Mono", "Fira Code", monospace;
+  font-size: 13px;
+  border: none;
+}
+
+/* Inactive tabs */
+tabbar tabbox tab {
+  background-color: #0B0E14;
+  color: #5C6773;
+  border: none;
+  border-radius: 6px 6px 0 0;
+  margin: 4px 2px 0 2px;
+  padding: 0 12px;
+}
+
+/* Tab hover */
+tabbar tabbox tab:hover:not(:selected) {
+  background-color: #1F2430;
+  color: #E6E1CF;
+}
+
+/* Active tab */
+tabbar tabbox tab:selected {
+  background-color: #769acb;
+  color: #0F1419;
+  font-weight: 600;
+}
+
+tabbar tabbox tab:selected label {
+  font-weight: 600;
+  color: #0F1419;
+}
+
+
+/* Tab labels */
+tabbar tabbox tab label {
+  font-size: 13px;
+}
+
+
+/* Close button */
+tabbar tabbox tab button {
+  background: transparent;
+  border: none;
+  color: #5C6773;
+  border-radius: 4px;
+  opacity: 0;
+  min-width: 0;
+  min-height: 0;
+}
+
+tabbar tabbox tab:hover button {
+  opacity: 0.7;
+}
+
+tabbar tabbox tab button:hover {
+  background-color: #F07178;
+  color: #E6E1CF;
+  opacity: 1;
+}
+
+/* New tab button */
+tabbar button {
+  background-color: transparent;
+  color: #5C6773;
+  border: none;
+  border-radius: 4px;
+  min-width: 0;
+  min-height: 0;
+}
+
+tabbar button:hover {
+  background-color: #1F2430;
+  color: #E6E1CF;
+}

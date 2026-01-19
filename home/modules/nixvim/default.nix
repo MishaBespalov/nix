@@ -5,13 +5,13 @@
     viAlias = true;
     vimAlias = true;
 
-    colorschemes.gruvbox = {
-      enable = true;
+    colorschemes.ayu = {
+      enable = false;
       settings = {
-        contrast = ""; # "soft" | "" | "hard"
-        transparent_mode = false;
+        mirage = false;
       };
     };
+
     plugins = {
       obsidian = {
         enable = true;
@@ -290,7 +290,7 @@
             "<CR>" = "cmp.mapping.confirm({ select = true })";
           };
           sources = [
-            {name = "supermaven";}
+            # {name = "supermaven";}
             {name = "nvim_lsp";}
             {name = "luasnip";}
             {name = "path";}
@@ -699,6 +699,15 @@
     ];
 
     extraPlugins = with pkgs.vimPlugins; [
+      (pkgs.vimUtils.buildVimPlugin {
+        name = "rustheme";
+        src = pkgs.fetchFromGitHub {
+          owner = "nasccped";
+          repo = "rustheme.nvim";
+          rev = "2545d6db4ba9932b7a1b815a993901271b6f768b";
+          sha256 = "1qd7zcyg07166jmvmcp8mj5wajsnbabf0ika098kx8lc4hrz7dwv";
+        };
+      })
       # supermaven-nvim
       nvim-lint
       plenary-nvim
@@ -709,7 +718,8 @@
     ];
 
     extraConfigLua = ''
-                  local lspconfig = require('lspconfig')
+      vim.cmd.colorscheme("rustheme")
+      local lspconfig = require('lspconfig')
                   lspconfig["rust_analyzer"].setup({
                      cmd = { "rust-analyzer" },
                      settings = {
@@ -1027,239 +1037,6 @@
         end,
       })
 
-      -- fzf-lua highlight groups for better Gruvbox visibility
-      vim.api.nvim_set_hl(0, "FzfLuaCursor", {
-        bg = "#504945", -- gruvbox dark2 - visible against dark background
-        fg = "#ebdbb2", -- gruvbox light foreground
-        bold = true,
-      })
-      vim.api.nvim_set_hl(0, "FzfLuaCursorLine", {
-        bg = "#504945", -- gruvbox dark2
-      })
-      vim.api.nvim_set_hl(0, "FzfLuaMatch", {
-        fg = "#83a598", -- gruvbox bright blue
-        bold = true,
-      })
-      vim.api.nvim_set_hl(0, "FzfLuaBorder", {
-        fg = "#665c54", -- gruvbox dark4
-      })
-      vim.api.nvim_set_hl(0, "FzfLuaPreviewBorder", {
-        fg = "#665c54", -- gruvbox dark4
-      })
-      vim.api.nvim_set_hl(0, "FzfLuaTitle", {
-        fg = "#fabd2f", -- gruvbox bright yellow
-        bold = true,
-      })
-
-
-      -- Custom Rust accent colors (only the ones we want to override)
-      local rust_colors = {
-        muted_red = "#9d0006",
-        muted_orange = "#af3a03",
-        soft_orange = "#d65d0e",
-        muted_yellow = "#b57614",
-        muted_green = "#79740e",
-        soft_green = "#98971a",
-        bright_green = "#b8bb26",
-        muted_aqua = "#427b58",
-        soft_aqua = "#689d6a",
-        bright_aqua = "#8ec07c",
-        muted_blue = "#076678",
-        soft_blue = "#458588",
-        bright_blue = "#83a598",
-        muted_purple = "#8f3f71",
-        soft_purple = "#b16286",
-        bright_purple = "#d3869b",
-      }
-
-      -- Custom Rust syntax highlighting
-      vim.api.nvim_create_autocmd("FileType", {
-        pattern = "rust",
-        callback = function()
-          -- Keywords
-          vim.api.nvim_set_hl(0, "@keyword.rust", { fg = rust_colors.soft_orange })
-          vim.api.nvim_set_hl(0, "@keyword.function.rust", { fg = rust_colors.soft_orange })
-          vim.api.nvim_set_hl(0, "@keyword.operator.rust", { fg = rust_colors.soft_orange })
-          vim.api.nvim_set_hl(0, "@keyword.return.rust", { fg = rust_colors.soft_orange })
-          vim.api.nvim_set_hl(0, "@keyword.modifier.rust", { fg = rust_colors.soft_orange })
-          vim.api.nvim_set_hl(0, "@keyword.import.rust", { fg = rust_colors.soft_orange })
-          vim.api.nvim_set_hl(0, "@keyword.conditional.rust", { fg = rust_colors.soft_orange })
-          vim.api.nvim_set_hl(0, "@keyword.repeat.rust", { fg = rust_colors.soft_orange })
-          vim.api.nvim_set_hl(0, "@keyword.exception.rust", { fg = rust_colors.soft_orange })
-
-          -- Functions
-          vim.api.nvim_set_hl(0, "@function.rust", { fg = rust_colors.bright_aqua })
-          vim.api.nvim_set_hl(0, "@function.call.rust", { fg = rust_colors.bright_aqua })
-          vim.api.nvim_set_hl(0, "@function.method.rust", { fg = rust_colors.bright_aqua })
-          vim.api.nvim_set_hl(0, "@function.method.call.rust", { fg = rust_colors.bright_aqua })
-          vim.api.nvim_set_hl(0, "@function.macro.rust", { fg = rust_colors.soft_aqua })
-          vim.api.nvim_set_hl(0, "@function.builtin.rust", { fg = rust_colors.bright_aqua })
-
-          -- Types
-          vim.api.nvim_set_hl(0, "@type.rust", { fg = rust_colors.muted_yellow })
-          vim.api.nvim_set_hl(0, "@type.builtin.rust", { fg = rust_colors.muted_yellow })
-          vim.api.nvim_set_hl(0, "@type.definition.rust", { fg = rust_colors.muted_yellow })
-          vim.api.nvim_set_hl(0, "@type.qualifier.rust", { fg = rust_colors.soft_orange })
-
-          -- Variables
-          vim.api.nvim_set_hl(0, "@variable.rust", { fg = rust_colors.soft_blue })
-          vim.api.nvim_set_hl(0, "@variable.builtin.rust", { fg = rust_colors.bright_purple })
-          vim.api.nvim_set_hl(0, "@variable.member.rust", { fg = rust_colors.bright_blue })
-
-          -- Constants
-          vim.api.nvim_set_hl(0, "@constant.rust", { fg = rust_colors.bright_purple })
-          vim.api.nvim_set_hl(0, "@constant.builtin.rust", { fg = rust_colors.bright_purple })
-          vim.api.nvim_set_hl(0, "@constant.macro.rust", { fg = rust_colors.soft_aqua })
-
-          -- Strings
-          vim.api.nvim_set_hl(0, "@string.rust", { fg = rust_colors.soft_green })
-          vim.api.nvim_set_hl(0, "@string.escape.rust", { fg = rust_colors.soft_aqua })
-          vim.api.nvim_set_hl(0, "@string.special.rust", { fg = rust_colors.soft_aqua })
-          vim.api.nvim_set_hl(0, "@string.regexp.rust", { fg = rust_colors.soft_orange })
-
-          -- Properties/Fields
-          vim.api.nvim_set_hl(0, "@property.rust", { fg = rust_colors.bright_blue })
-          vim.api.nvim_set_hl(0, "@field.rust", { fg = rust_colors.bright_blue })
-
-          -- Namespaces/Modules (use soft light color)
-          vim.api.nvim_set_hl(0, "@module.rust", { fg = "#d5c4a1" })
-          vim.api.nvim_set_hl(0, "@namespace.rust", { fg = "#d5c4a1" })
-
-          -- Labels
-          vim.api.nvim_set_hl(0, "@label.rust", { fg = rust_colors.bright_blue })
-
-          -- Special punctuation (references, pointers)
-          vim.api.nvim_set_hl(0, "@punctuation.special.rust", { fg = rust_colors.soft_orange })
-
-          -- Numbers
-          vim.api.nvim_set_hl(0, "@number.rust", { fg = rust_colors.bright_purple })
-          vim.api.nvim_set_hl(0, "@number.float.rust", { fg = rust_colors.bright_purple })
-
-          -- Booleans
-          vim.api.nvim_set_hl(0, "@boolean.rust", { fg = rust_colors.bright_purple })
-
-          -- Characters
-          vim.api.nvim_set_hl(0, "@character.rust", { fg = rust_colors.bright_purple })
-          vim.api.nvim_set_hl(0, "@character.special.rust", { fg = rust_colors.soft_aqua })
-
-          -- Lifetimes
-          vim.api.nvim_set_hl(0, "@lifetime.rust", { fg = rust_colors.soft_purple })
-          vim.api.nvim_set_hl(0, "@storageclass.lifetime.rust", { fg = rust_colors.soft_purple })
-
-          -- Traits
-          vim.api.nvim_set_hl(0, "@type.trait.rust", { fg = rust_colors.muted_yellow, italic = true })
-
-          -- Enums
-          vim.api.nvim_set_hl(0, "@type.enum.rust", { fg = rust_colors.muted_yellow })
-          vim.api.nvim_set_hl(0, "@constant.enum.rust", { fg = rust_colors.bright_purple })
-
-          -- Errors
-          vim.api.nvim_set_hl(0, "@error.rust", { fg = rust_colors.muted_red })
-
-          -- Constructors
-          vim.api.nvim_set_hl(0, "@constructor.rust", { fg = rust_colors.muted_yellow })
-
-          -- Include (use statements)
-          vim.api.nvim_set_hl(0, "@include.rust", { fg = rust_colors.soft_orange })
-
-          -- Unsafe
-          vim.api.nvim_set_hl(0, "@keyword.unsafe.rust", { fg = rust_colors.soft_orange, bold = true })
-
-          -- References and Pointers
-          vim.api.nvim_set_hl(0, "@punctuation.special.reference.rust", { fg = rust_colors.soft_orange })
-
-          -- Generic parameters
-          vim.api.nvim_set_hl(0, "@type.parameter.rust", { fg = "#d5c4a1" })
-
-          -- Where clauses
-          vim.api.nvim_set_hl(0, "@keyword.where.rust", { fg = rust_colors.soft_orange })
-
-          -- LSP Semantic Token Highlights
-          vim.api.nvim_set_hl(0, "@lsp.type.namespace.rust", { fg = "#d5c4a1" })
-          vim.api.nvim_set_hl(0, "@lsp.type.type.rust", { fg = rust_colors.muted_yellow })
-          vim.api.nvim_set_hl(0, "@lsp.type.class.rust", { fg = rust_colors.muted_yellow })
-          vim.api.nvim_set_hl(0, "@lsp.type.enum.rust", { fg = rust_colors.muted_yellow })
-          vim.api.nvim_set_hl(0, "@lsp.type.interface.rust", { fg = rust_colors.muted_yellow, italic = true })
-          vim.api.nvim_set_hl(0, "@lsp.type.struct.rust", { fg = rust_colors.muted_yellow })
-          vim.api.nvim_set_hl(0, "@lsp.type.typeParameter.rust", { fg = "#d5c4a1" })
-          vim.api.nvim_set_hl(0, "@lsp.type.parameter.rust", { fg = rust_colors.soft_blue })
-          vim.api.nvim_set_hl(0, "@lsp.type.variable.rust", { fg = rust_colors.soft_blue })
-          vim.api.nvim_set_hl(0, "@lsp.type.property.rust", { fg = rust_colors.bright_blue })
-          vim.api.nvim_set_hl(0, "@lsp.type.enumMember.rust", { fg = rust_colors.bright_purple })
-          vim.api.nvim_set_hl(0, "@lsp.type.function.rust", { fg = rust_colors.bright_aqua })
-          vim.api.nvim_set_hl(0, "@lsp.type.method.rust", { fg = rust_colors.bright_aqua })
-          vim.api.nvim_set_hl(0, "@lsp.type.macro.rust", { fg = rust_colors.soft_aqua })
-          vim.api.nvim_set_hl(0, "@lsp.type.keyword.rust", { fg = rust_colors.soft_orange })
-          vim.api.nvim_set_hl(0, "@lsp.type.comment.rust", { fg = rust_colors.gray, italic = true })
-          vim.api.nvim_set_hl(0, "@lsp.type.string.rust", { fg = rust_colors.soft_green })
-          vim.api.nvim_set_hl(0, "@lsp.type.number.rust", { fg = rust_colors.bright_purple })
-          vim.api.nvim_set_hl(0, "@lsp.type.operator.rust", { fg = rust_colors.fg3 })
-          vim.api.nvim_set_hl(0, "@lsp.type.lifetime.rust", { fg = rust_colors.soft_purple })
-          vim.api.nvim_set_hl(0, "@lsp.type.builtinType.rust", { fg = rust_colors.muted_yellow })
-          vim.api.nvim_set_hl(0, "@lsp.type.selfKeyword.rust", { fg = rust_colors.bright_purple })
-          vim.api.nvim_set_hl(0, "@lsp.type.selfTypeKeyword.rust", { fg = rust_colors.muted_yellow })
-          vim.api.nvim_set_hl(0, "@lsp.type.deriveHelper.rust", { fg = rust_colors.gray })
-          vim.api.nvim_set_hl(0, "@lsp.type.formatSpecifier.rust", { fg = rust_colors.soft_aqua })
-
-          -- LSP Semantic token modifiers (only the ones we want to customize)
-          vim.api.nvim_set_hl(0, "@lsp.mod.mutable.rust", { underline = true })
-          vim.api.nvim_set_hl(0, "@lsp.mod.unsafe.rust", { bold = true })
-          vim.api.nvim_set_hl(0, "@lsp.mod.deprecated.rust", { fg = rust_colors.muted_red, strikethrough = true })
-
-          -- Unused items (pale yellow-orange)
-          vim.api.nvim_set_hl(0, "@lsp.typemod.variable.unused.rust", { fg = "#c4a67c", italic = true })
-          vim.api.nvim_set_hl(0, "@lsp.typemod.function.unused.rust", { fg = "#c4a67c", italic = true })
-          vim.api.nvim_set_hl(0, "@lsp.typemod.parameter.unused.rust", { fg = "#c4a67c", italic = true })
-          vim.api.nvim_set_hl(0, "@lsp.typemod.type.unused.rust", { fg = "#c4a67c", italic = true })
-
-          -- Alternative unused patterns (rust-analyzer might use different names)
-          vim.api.nvim_set_hl(0, "@lsp.mod.unused.rust", { fg = "#c4a67c", italic = true })
-          vim.api.nvim_set_hl(0, "DiagnosticUnnecessary", { fg = rust_colors.muted_orange, italic = true })
-          vim.api.nvim_set_hl(0, "DiagnosticDeprecated", { fg = rust_colors.muted_orange, strikethrough = true })
-
-          -- Combined type.modifier patterns
-          vim.api.nvim_set_hl(0, "@lsp.typemod.function.declaration.rust", { fg = rust_colors.bright_aqua })
-          vim.api.nvim_set_hl(0, "@lsp.typemod.method.declaration.rust", { fg = rust_colors.bright_aqua })
-          vim.api.nvim_set_hl(0, "@lsp.typemod.variable.mutable.rust", { underline = true })
-          vim.api.nvim_set_hl(0, "@lsp.typemod.parameter.mutable.rust", { underline = true })
-          vim.api.nvim_set_hl(0, "@lsp.typemod.selfKeyword.mutable.rust", { fg = rust_colors.bright_purple, underline = true })
-        end,
-      })
-
-      -- Set global diagnostic highlights with delayed application
-      vim.api.nvim_create_autocmd("LspAttach", {
-        callback = function()
-          -- Delay to ensure LSP has fully loaded
-          vim.defer_fn(function()
-            vim.api.nvim_set_hl(0, "DiagnosticUnnecessary", { fg = "#c4a67c", italic = true })
-            vim.api.nvim_set_hl(0, "DiagnosticDeprecated", { fg = "#c4a67c", strikethrough = true })
-            vim.cmd("redraw!")
-          end, 100)
-        end,
-      })
-
-      -- Also try after colorscheme loads
-      vim.api.nvim_create_autocmd("ColorScheme", {
-        callback = function()
-          vim.defer_fn(function()
-            vim.api.nvim_set_hl(0, "DiagnosticUnnecessary", { fg = "#c4a67c", italic = true })
-            vim.api.nvim_set_hl(0, "DiagnosticDeprecated", { fg = "#c4a67c", strikethrough = true })
-          end, 50)
-        end,
-      })
-
-      -- Also set them immediately
-      vim.api.nvim_set_hl(0, "DiagnosticUnnecessary", { fg = "#c4a67c", italic = true })
-      vim.api.nvim_set_hl(0, "DiagnosticDeprecated", { fg = "#c4a67c", strikethrough = true })
-
-      -- Create user command to manually fix unused colors
-      vim.api.nvim_create_user_command("FixUnusedColors", function()
-        vim.api.nvim_set_hl(0, "DiagnosticUnnecessary", { fg = "#c4a67c", italic = true })
-        vim.api.nvim_set_hl(0, "DiagnosticDeprecated", { fg = "#c4a67c", strikethrough = true })
-        vim.cmd("redraw!")
-        print("Unused variable colors fixed!")
-      end, {})
-
       -- Task cycling function
       function CycleMarkdownTask()
         -- Only work in markdown files
@@ -1325,19 +1102,5 @@
       end
 
     '';
-
-    # extraConfigLua = "''
-    #   require("supermaven-nvim").setup({
-    #     disable_inline_completion = true,  # we use cmp for the UI
-    #     keymaps = {                         # avoid <Tab> conflicts
-    #       accept_suggestion = "<C-l>",
-    #       accept_word       = "<C-j>",
-    #       clear_suggestion  = "<C-]>",
-    #     },
-    #     # optional hygiene: don't suggest in these filetypes
-    #     ignore_filetypes = { "gitcommit", "markdown" },
-    #     log_level = "off",
-    #   })
-    # '';
   };
 }

@@ -14,7 +14,7 @@
   programs.bat = {
     enable = true;
     config = {
-      theme = "gruvbox-dark";
+      theme = "base16";
       style = "numbers,changes,header";
     };
   };
@@ -402,8 +402,7 @@
     enableFishIntegration = true;
 
     settings = {
-      # theme = "miasma";
-      theme = "Gruvbox Dark";
+      theme = "Ayu";
       font-size = 21;
       mouse-hide-while-typing = true;
       window-decoration = "auto";
@@ -413,10 +412,10 @@
       background-opacity = 1;
       gtk-wide-tabs = false;
       shell-integration = "fish";
-      cursor-color = "#458588";
+      cursor-color = "#769acb";
       copy-on-select = "clipboard";
       gtk-tabs-location = "bottom";
-      gtk-custom-css = "/home/misha/nixos-dotfiles/home/modules/shell/ghostty-gruvbox-tabs.css";
+      gtk-custom-css = "/home/misha/nixos-dotfiles/home/modules/shell/ghostty-ayu-tabs.css";
 
       custom-shader = [
         "shaders/sonic_boom_cursor.glsl"
