@@ -402,7 +402,7 @@
     enableFishIntegration = true;
 
     settings = {
-      theme = "Ghostty Default Style Dark";
+      theme = "Ayu";
       font-size = 21;
       mouse-hide-while-typing = true;
       window-decoration = "auto";
