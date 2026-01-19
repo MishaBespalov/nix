@@ -1,12 +1,12 @@
 /* Gruvbox Dark Theme for Ghostty Tab Bar */
 
 tabbar {
-  background-color: #282828;
+  background-color: #1f1f1f;
   border: none;
 }
 
 tabbar tabbox {
-  background-color: #282828;
+  background-color: #1f1f1f;
   font-family: "JetBrains Mono", "Fira Code", monospace;
   font-size: 13px;
   border: none;
@@ -31,13 +31,13 @@ tabbar tabbox tab:hover:not(:selected) {
 /* Active tab */
 tabbar tabbox tab:selected {
   background-color: #928374;
-  color: #282828;
+  color: #1f1f1f;
   font-weight: 600;
 }
 
 tabbar tabbox tab:selected label {
   font-weight: 600;
-  color: #282828;
+  color: #1f1f1f;
 }
 
 

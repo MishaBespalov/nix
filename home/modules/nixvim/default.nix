@@ -10,6 +10,9 @@
       settings = {
         contrast = ""; # "soft" | "" | "hard"
         transparent_mode = false;
+        overrides = {
+          Normal = {bg = "#1f1f1f";};
+        };
       };
     };
     plugins = {

@@ -410,6 +410,7 @@
       window-inherit-working-directory = true;
       app-notifications = "no-clipboard-copy";
       working-directory = "home";
+      background = "#1f1f1f";
       background-opacity = 1;
       gtk-wide-tabs = false;
       shell-integration = "fish";
