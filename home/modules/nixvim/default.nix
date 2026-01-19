@@ -719,6 +719,9 @@
 
     extraConfigLua = ''
       vim.cmd.colorscheme("rustheme")
+      vim.api.nvim_set_hl(0, "Normal", { bg = "#222222" })
+      vim.api.nvim_set_hl(0, "NormalFloat", { bg = "#222222" })
+
       local lspconfig = require('lspconfig')
                   lspconfig["rust_analyzer"].setup({
                      cmd = { "rust-analyzer" },
