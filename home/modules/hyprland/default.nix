@@ -67,8 +67,8 @@
         gaps_in = 6;
         gaps_out = 12;
         border_size = 1;
-        "col.active_border" = "rgba(665c54FF) rgba(7c6f64FF) 45deg";
-        "col.inactive_border" = "rgba(3c383640)";
+        "col.active_border" = "rgba(ffb454FF) rgba(39bae6FF) 45deg";
+        "col.inactive_border" = "rgba(1f243040)";
       };
       decoration = {
         rounding = 8;

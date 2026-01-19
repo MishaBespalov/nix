@@ -5,114 +5,114 @@
   programs.k9s = {
     enable = true;
 
-    # Set default skin and custom gruvbox dark theme
+    # Set default skin and custom ayu theme
     settings = {
       k9s = {
         ui = {
-          skin = "gruvbox_dark";
+          skin = "ayu";
         };
       };
     };
 
     skins = {
-      gruvbox_dark = {
+      ayu = {
         k9s = {
           body = {
-            fgColor = "#d5c4a1"; # softer gruvbox light4 instead of bright fg1
-            bgColor = "#282828"; # softer gruvbox bg0 instead of hard bg0
-            logoColor = "#d79921"; # muted yellow instead of bright yellow
+            fgColor = "#e6e1cf";
+            bgColor = "#0f1419";
+            logoColor = "#ffb454";
           };
           prompt = {
-            fgColor = "#ebdbb2"; # softer fg1 instead of brightest fg0
-            bgColor = "#3c3836"; # keep bg1 for subtle contrast
-            suggestColor = "#7c6f64"; # muted bg4 instead of bright blue
+            fgColor = "#e6e1cf";
+            bgColor = "#131721";
+            suggestColor = "#5c6773";
           };
           info = {
-            fgColor = "#bdae93"; # softer fg3 instead of purple
-            sectionColor = "#d5c4a1"; # softer light4 instead of bright fg0
+            fgColor = "#b3b1ad";
+            sectionColor = "#e6e1cf";
           };
           dialog = {
-            fgColor = "#d5c4a1"; # softer light4 instead of bright fg0
-            bgColor = "#3c3836"; # keep bg1
-            buttonFgColor = "#504945"; # softer bg2 instead of harsh dark
-            buttonBgColor = "#7c6f64"; # muted bg4 instead of bright blue
-            buttonFocusFgColor = "#282828"; # softer bg0 instead of harsh dark
-            buttonFocusBgColor = "#d79921"; # muted yellow instead of bright
-            labelFgColor = "#cc241d"; # softer red instead of bright red
-            fieldFgColor = "#d5c4a1"; # softer light4
+            fgColor = "#e6e1cf";
+            bgColor = "#131721";
+            buttonFgColor = "#e6e1cf";
+            buttonBgColor = "#39bae6";
+            buttonFocusFgColor = "#0f1419";
+            buttonFocusBgColor = "#ffb454";
+            labelFgColor = "#ff3333";
+            fieldFgColor = "#e6e1cf";
           };
           frame = {
             border = {
-              fgColor = "#504945"; # softer bg2 instead of bg3
-              focusColor = "#d79921"; # muted yellow instead of bright
+              fgColor = "#5c6773";
+              focusColor = "#ffb454";
             };
             menu = {
-              fgColor = "#d5c4a1"; # softer light4
-              keyColor = "#bdae93"; # muted fg3 instead of purple
-              numKeyColor = "#bdae93"; # muted fg3
+              fgColor = "#e6e1cf";
+              keyColor = "#ffb454";
+              numKeyColor = "#ffb454";
             };
             crumbs = {
-              fgColor = "#3c3836"; # softer bg1 instead of harsh dark
-              bgColor = "#7c6f64"; # muted bg4 instead of bright blue
-              activeColor = "#d79921"; # muted yellow
+              fgColor = "#131721";
+              bgColor = "#39bae6";
+              activeColor = "#ffb454";
             };
             status = {
-              newColor = "#98971a"; # softer green instead of bright
-              modifyColor = "#7c6f64"; # muted bg4 instead of bright blue
-              addColor = "#689d6a"; # softer aqua instead of bright
-              errorColor = "#cc241d"; # softer red instead of bright
-              highlightColor = "#d65d0e"; # softer orange instead of bright
-              killColor = "#cc241d"; # softer red
-              completedColor = "#928374"; # keep muted gray
+              newColor = "#c2d94c";
+              modifyColor = "#39bae6";
+              addColor = "#c2d94c";
+              errorColor = "#ff3333";
+              highlightColor = "#ffb454";
+              killColor = "#ff3333";
+              completedColor = "#b3b1ad";
             };
             title = {
-              fgColor = "#ebdbb2"; # softer fg1 instead of bright fg0
-              bgColor = "#3c3836"; # softer bg1 instead of bg0
-              highlightColor = "#d79921"; # muted yellow
-              counterColor = "#bdae93"; # muted fg3 instead of purple
-              filterColor = "#d79921"; # muted yellow
+              fgColor = "#e6e1cf";
+              bgColor = "#131721";
+              highlightColor = "#ffb454";
+              counterColor = "#b3b1ad";
+              filterColor = "#ffb454";
             };
           };
           views = {
             charts = {
-              bgColor = "#282828"; # softer bg0 instead of hard
-              dialBgColor = "#3c3836"; # keep bg1
-              chartBgColor = "#504945"; # softer bg2 for subtle contrast
-              defaultDialColors = ["#cc241d" "#98971a" "#d79921" "#458588" "#b16286" "#689d6a"]; # muted palette
-              defaultChartColors = ["#cc241d" "#98971a" "#d79921" "#458588" "#b16286" "#689d6a"]; # muted palette
+              bgColor = "#0f1419";
+              dialBgColor = "#131721";
+              chartBgColor = "#131721";
+              defaultDialColors = ["#ff3333" "#c2d94c" "#ffb454" "#39bae6" "#d4bfff" "#95e6cb"];
+              defaultChartColors = ["#ff3333" "#c2d94c" "#ffb454" "#39bae6" "#d4bfff" "#95e6cb"];
             };
             table = {
-              fgColor = "#d5c4a1"; # softer light4
-              bgColor = "#282828"; # softer bg0 instead of hard
-              cursorFgColor = "#3c3836"; # softer bg1 instead of harsh dark
-              cursorBgColor = "#d79921"; # muted yellow
-              markColor = "#bdae93"; # muted fg3 instead of purple
+              fgColor = "#e6e1cf";
+              bgColor = "#0f1419";
+              cursorFgColor = "#0f1419";
+              cursorBgColor = "#ffb454";
+              markColor = "#ffb454";
               header = {
-                fgColor = "#ebdbb2"; # softer fg1
-                bgColor = "#504945"; # softer bg2 for subtle contrast
-                sorterColor = "#7c6f64"; # muted bg4 instead of bright blue
+                fgColor = "#e6e1cf";
+                bgColor = "#131721";
+                sorterColor = "#39bae6";
               };
             };
             xray = {
-              fgColor = "#d5c4a1"; # softer light4
-              bgColor = "#282828"; # softer bg0
-              cursorColor = "#d79921"; # muted yellow
-              graphicColor = "#7c6f64"; # muted bg4 instead of bright blue
+              fgColor = "#e6e1cf";
+              bgColor = "#0f1419";
+              cursorColor = "#ffb454";
+              graphicColor = "#39bae6";
               showIcons = false;
             };
             yaml = {
-              keyColor = "#7c6f64"; # muted bg4 instead of bright blue
-              colonColor = "#928374"; # keep muted gray
-              valueColor = "#d5c4a1"; # softer light4
+              keyColor = "#39bae6";
+              colonColor = "#b3b1ad";
+              valueColor = "#e6e1cf";
             };
             logs = {
-              fgColor = "#d5c4a1"; # softer light4
-              bgColor = "#282828"; # softer bg0
+              fgColor = "#e6e1cf";
+              bgColor = "#0f1419";
               indicator = {
-                fgColor = "#bdae93"; # muted fg3 instead of purple
-                bgColor = "#3c3836"; # keep bg1
-                toggleOnColor = "#98971a"; # softer green
-                toggleOffColor = "#cc241d"; # softer red
+                fgColor = "#b3b1ad";
+                bgColor = "#131721";
+                toggleOnColor = "#c2d94c";
+                toggleOffColor = "#ff3333";
               };
             };
           };

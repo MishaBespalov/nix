@@ -1,7 +1,8 @@
 {
   pkgs,
   inputs,
-  ...}: {
+  ...
+}: {
   services.hyprsunset = {
     enable = true; # start as a user service on login
 
@@ -26,14 +27,14 @@
     };
   };
 
-  # Minimal mako: simple toast notifications with gruvbox theme
+  # Minimal mako: simple toast notifications with ayu theme
   services.mako = {
     enable = true;
     settings = {
       anchor = "top-right";
-      background-color = "#282828";
-      text-color = "#ebdbb2";
-      border-color = "#665c54";
+      background-color = "#0f1419";
+      text-color = "#e6e1cf";
+      border-color = "#ffb454";
       border-radius = 8;
       border-size = 1;
       default-timeout = 5000;
@@ -118,10 +119,10 @@
             week-start = 1;
             on-scroll = 1;
             format = {
-              months = "<span color='#fabd2f'><b>{}</b></span>";
-              days = "<span color='#ebdbb2'><b>{}</b></span>";
-              weekdays = "<span color='#d79921'><b>{}</b></span>";
-              today = "<span color='#fb4934'><b><u>{}</u></b></span>";
+              months = "<span color='#ffb454'><b>{}</b></span>";
+              days = "<span color='#e6e1cf'><b>{}</b></span>";
+              weekdays = "<span color='#e6b450'><b>{}</b></span>";
+              today = "<span color='#ff3333'><b><u>{}</u></b></span>";
             };
           };
           actions = {
@@ -136,11 +137,11 @@
     };
 
     style = ''
-      /* Gruvbox Dark theme for Waybar */
+      /* Ayu Dark theme for Waybar */
       * {
         border: none;
         border-radius: 0;
-        font-family: \"JetBrains Mono\", monospace;
+        font-family: "JetBrains Mono", monospace;
         font-size: 13px;
         min-height: 0;
       }
@@ -148,31 +149,31 @@
       window#waybar {
         background-color: transparent;
         border-radius: 12px;
-        color: #ebdbb2;
+        color: #e6e1cf;
       }
 
       #clock {
-        background-color: #282828;
-        color: #ebdbb2;
+        background-color: #0f1419;
+        color: #e6e1cf;
         padding: 6px 16px;
         border-radius: 10px;
-        border: 1px solid #504945;
+        border: 1px solid #5c6773;
         font-weight: bold;
         font-size: 14px;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
       }
 
       #clock:hover {
-        background-color: #3c3836;
-        border-color: #7c6f64;
+        background-color: #131721;
+        border-color: #707a8c;
       }
 
       #tray {
-        background-color: #282828;
-        color: #ebdbb2;
+        background-color: #0f1419;
+        color: #e6e1cf;
         padding: 6px 16px;
         border-radius: 10px;
-        border: 1px solid #504945;
+        border: 1px solid #5c6773;
         margin-left: 8px;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
       }
@@ -183,18 +184,18 @@
 
       #tray > .needs-attention {
         -gtk-icon-effect: highlight;
-        background-color: #cc241d;
+        background-color: #ff3333;
       }
 
       tooltip {
-        background-color: #282828;
-        border: 1px solid #504945;
+        background-color: #0f1419;
+        border: 1px solid #5c6773;
         border-radius: 8px;
-        color: #ebdbb2;
+        color: #e6e1cf;
       }
 
       tooltip label {
-        color: #ebdbb2;
+        color: #e6e1cf;
       }
     '';
   };
@@ -211,17 +212,16 @@
       lines = 10;
     };
 
-    # Gruvbox theme (warm dark colors)
+    # Ayu theme (warm dark colors)
     style = ''
-      /* ----- Gruvbox palette ----- */
-      /* https://github.com/morhetz/gruvbox */
-      @define-color bg        #1d2021;  /* hard dark background */
-      @define-color bg-alt    #282828;  /* normal dark background */
-      @define-color surface   #3c3836;  /* dark gray */
-      @define-color text      #ebdbb2;  /* light foreground */
-      @define-color subtext   #d5c4a1;  /* light4 */
-      @define-color accent    #fabd2f;  /* bright yellow */
-      @define-color accent2   #83a598;  /* bright blue */
+      /* ----- Ayu palette ----- */
+      @define-color bg        #0f1419;  /* ayu dark background */
+      @define-color bg-alt    #131721;  /* ayu dark background alt */
+      @define-color surface   #1f2430;  /* ayu mirage bg (slightly lighter) */
+      @define-color text      #e6e1cf;  /* ayu fg */
+      @define-color subtext   #b3b1ad;  /* ayu comment/fg idle */
+      @define-color accent    #ffb454;  /* ayu orange/yellow */
+      @define-color accent2   #39bae6;  /* ayu blue */
 
       /* ----- base widgets ----- */
       * { font-family: JetBrainsMono Nerd Font, monospace; font-size: 14px; }
@@ -298,11 +298,11 @@
           dots_spacing = 0.35;
           dots_center = true;
           outer_color = "rgba(0, 0, 0, 0)";
-          inner_color = "rgba(40, 40, 40, 0.8)"; # gruvbox dark background with transparency
-          font_color = "rgb(235, 219, 178)"; # gruvbox light foreground
+          inner_color = "rgba(15, 20, 25, 0.8)"; # ayu dark background with transparency
+          font_color = "rgb(230, 225, 207)"; # ayu light foreground
           fade_on_empty = false;
           rounding = -1;
-          check_color = "rgb(250, 189, 47)"; # gruvbox bright yellow
+          check_color = "rgb(255, 180, 84)"; # ayu bright yellow/orange
           placeholder_text = "Input Password...";
           hide_input = false;
           position = "0, -200";
@@ -315,7 +315,7 @@
         {
           monitor = "";
           text = "cmd[update:1000] echo \"$(date +\"%A, %B %d\")\"";
-          color = "rgba(235, 219, 178, 0.75)"; # gruvbox light foreground with transparency
+          color = "rgba(230, 225, 207, 0.75)"; # ayu light foreground with transparency
           font_size = 22;
           font_family = "JetBrains Mono";
           position = "0, 300";
@@ -325,7 +325,7 @@
         {
           monitor = "";
           text = "cmd[update:1000] echo \"$(date +\"%-I:%M\")\"";
-          color = "rgba(235, 219, 178, 0.75)"; # gruvbox light foreground with transparency
+          color = "rgba(230, 225, 207, 0.75)"; # ayu light foreground with transparency
           font_size = 95;
           font_family = "JetBrains Mono Nerd Font";
           position = "0, 200";
@@ -361,3 +361,4 @@
     };
   };
 }
+

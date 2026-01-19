@@ -409,13 +409,14 @@
       window-inherit-working-directory = true;
       app-notifications = "no-clipboard-copy";
       working-directory = "home";
+      background = "#1f1f1f";
       background-opacity = 1;
       gtk-wide-tabs = false;
       shell-integration = "fish";
       cursor-color = "#769acb";
       copy-on-select = "clipboard";
       gtk-tabs-location = "bottom";
-      gtk-custom-css = "/home/misha/nixos-dotfiles/home/modules/shell/ghostty-default-tabs.css";
+      gtk-custom-css = "/home/misha/nixos-dotfiles/home/modules/shell/ghostty-ayu-tabs.css";
 
       custom-shader = [
         "shaders/sonic_boom_cursor.glsl"

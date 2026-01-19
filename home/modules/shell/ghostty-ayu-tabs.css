@@ -1,12 +1,12 @@
 /* Ayu Dark Theme for Ghostty Tab Bar */
 
 tabbar {
-  background-color: #0F1419;
+  background-color: #1f1f1f;
   border: none;
 }
 
 tabbar tabbox {
-  background-color: #0F1419;
+  background-color: #1f1f1f;
   font-family: "JetBrains Mono", "Fira Code", monospace;
   font-size: 13px;
   border: none;
@@ -14,7 +14,7 @@ tabbar tabbox {
 
 /* Inactive tabs */
 tabbar tabbox tab {
-  background-color: #0B0E14;
+  background-color: #1a1a1a;
   color: #5C6773;
   border: none;
   border-radius: 6px 6px 0 0;
@@ -24,7 +24,7 @@ tabbar tabbox tab {
 
 /* Tab hover */
 tabbar tabbox tab:hover:not(:selected) {
-  background-color: #1F2430;
+  background-color: #2a2a2a;
   color: #E6E1CF;
 }
 
@@ -79,6 +79,6 @@ tabbar button {
 }
 
 tabbar button:hover {
-  background-color: #1F2430;
+  background-color: #2a2a2a;
   color: #E6E1CF;
 }
