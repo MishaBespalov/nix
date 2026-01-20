@@ -28,6 +28,7 @@ in {
       gotools # goimports etc.
       gofumpt # formatter
       golangci-lint # meta-linter (optional)
+      zoom
       bacon
       nil
       zip
@@ -40,7 +41,6 @@ in {
       whatsapp-for-linux
       kdePackages.dolphin
       spotify
-      sing-box
       nixpkgs-fmt
       inputs.nixpkgs-unstable.legacyPackages.${pkgs.system}.nodejs_24
       gcc
@@ -129,12 +129,16 @@ in {
 
       # Python package management
       uv
+      xorg.xset
+      xorg.mkfontscale
     ])
     ++ [
       # Zig from overlay (latest stable release)
       inputs.zig.packages.${pkgs.system}.default
       # ZLS from unstable (latest available version)
       inputs.nixpkgs-unstable.legacyPackages.${pkgs.system}.zls
+      # sing-box from unstable (for newer version)
+      inputs.nixpkgs-unstable.legacyPackages.${pkgs.system}.sing-box
       # Zen Browser from flake
       zen-browser-wrapped
     ];

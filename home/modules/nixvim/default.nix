@@ -293,7 +293,7 @@
             "<CR>" = "cmp.mapping.confirm({ select = true })";
           };
           sources = [
-            {name = "supermaven";}
+            # {name = "supermaven";}
             {name = "nvim_lsp";}
             {name = "luasnip";}
             {name = "path";}

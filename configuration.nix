@@ -173,6 +173,17 @@ in {
 
   services.atd.enable = true;
 
+  # Zapret DPI bypass
+  services.zapret = {
+    enable = true;
+    params = [
+      "--dpi-desync=fake,disorder2"
+      "--dpi-desync-ttl=6"
+      "--dpi-desync-fooling=badsum,md5sig"
+      "--dpi-desync-split-pos=1"
+    ];
+  };
+
   services.prometheus.exporters.node = {
     enable = true;
     enabledCollectors = ["systemd"];
