@@ -336,16 +336,25 @@
     };
   };
 
+  xdg.desktopEntries.zen = {
+    name = "Zen Browser";
+    genericName = "Web Browser";
+    exec = "zen %u";
+    terminal = false;
+    categories = ["Network" "WebBrowser"];
+    mimeType = ["text/html" "x-scheme-handler/http" "x-scheme-handler/https"];
+  };
+
   # Set Zen Browser as default browser and VLC as default video player
   xdg.mimeApps = {
     enable = true;
     defaultApplications = {
-      "text/html" = "zen-twilight.desktop";
-      "x-scheme-handler/http" = "zen-twilight.desktop";
-      "x-scheme-handler/https" = "zen-twilight.desktop";
-      "x-scheme-handler/about" = "zen-twilight.desktop";
-      "x-scheme-handler/unknown" = "zen-twilight.desktop";
-      "application/pdf" = "zen-twilight.desktop";
+      "text/html" = "zen.desktop";
+      "x-scheme-handler/http" = "zen.desktop";
+      "x-scheme-handler/https" = "zen.desktop";
+      "x-scheme-handler/about" = "zen.desktop";
+      "x-scheme-handler/unknown" = "zen.desktop";
+      "application/pdf" = "zen.desktop";
 
       # Video files - VLC as default
       "video/mp4" = "vlc.desktop";
