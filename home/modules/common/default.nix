@@ -31,6 +31,7 @@ in {
       zoom
       bacon
       nil
+      chromium
       zip
       discord # Discord client
       betterdiscordctl # BetterDiscord management tool

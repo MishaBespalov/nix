@@ -253,20 +253,20 @@ in {
   users.users.misha.extraGroups = ["wheel" "video" "audio" "input" "docker" "netdev" "firezone-client" "libvirtd"];
 
   # Sing-box VPN service (temporarily disabled - using throne instead)
-  # systemd.services.sing-box = {
-  #   description = "Sing-box proxy service";
-  #   after = ["network-online.target"];
-  #   wants = ["network-online.target"];
-  #   wantedBy = ["multi-user.target"];
-  #   serviceConfig = {
-  #     Type = "simple";
-  #     Restart = "always";
-  #     RestartSec = "5";
-  #     ExecStart = "${pkgs.sing-box}/bin/sing-box run -c /home/misha/sing-box/main.json";
-  #     User = "root";
-  #     Group = "root";
-  #   };
-  # };
+  systemd.services.sing-box = {
+    description = "Sing-box proxy service";
+    after = ["network-online.target"];
+    wants = ["network-online.target"];
+    wantedBy = ["multi-user.target"];
+    serviceConfig = {
+      Type = "simple";
+      Restart = "always";
+      RestartSec = "5";
+      ExecStart = "${pkgs.sing-box}/bin/sing-box run -c /home/misha/sing-box/my-vps-split.json";
+      User = "root";
+      Group = "root";
+    };
+  };
 
   programs.hyprland.enable = true;
   programs.fish.enable = true;
@@ -318,7 +318,7 @@ in {
     qemu
     typst
     hiddify-app
-    throne
+    # throne
   ];
 
   fonts.packages = with pkgs; [

@@ -120,7 +120,7 @@
         # Start waybar
         "waybar"
 
-        "[workspace 1 silent] throne"
+        # "[workspace 1 silent] throne"
         "[workspace 2 silent] spotify"
         "[workspace 3 silent] telegram-desktop"
         "[workspace 4 silent] zen"
