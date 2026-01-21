@@ -262,7 +262,7 @@ in {
       Type = "simple";
       Restart = "always";
       RestartSec = "5";
-      ExecStart = "${pkgs.sing-box}/bin/sing-box run -c /home/misha/sing-box/my-vps-split.json";
+      ExecStart = "${pkgs.sing-box}/bin/sing-box run -c /home/misha/sing-box/germany-sirius.json";
       User = "root";
       Group = "root";
     };
