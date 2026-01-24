@@ -99,6 +99,14 @@ in {
 
   time.timeZone = "Europe/Moscow";
 
+  programs.nix-ld.enable = true;
+  programs.nix-ld.libraries = with pkgs; [
+    # Add libraries that Claude Code might need
+    stdenv.cc.cc.lib
+    zlib
+    openssl
+  ];
+
   # Set Monday as first day of week
   i18n.defaultLocale = "en_US.UTF-8";
   i18n.extraLocaleSettings = {
@@ -242,15 +250,8 @@ in {
   # Waydroid configuration
   virtualisation.waydroid.enable = true;
 
-  # KVM / QEMU
-  virtualisation.libvirtd.enable = true;
-  virtualisation.libvirtd.qemu.ovmf.enable = true;
-  virtualisation.libvirtd.qemu.swtpm.enable = true;
-  programs.virt-manager.enable = true;
-  networking.firewall.trustedInterfaces = ["virbr0"];
-
   # Add user to netdev group for TUN access
-  users.users.misha.extraGroups = ["wheel" "video" "audio" "input" "docker" "netdev" "firezone-client" "libvirtd"];
+  users.users.misha.extraGroups = ["wheel" "video" "audio" "input" "docker" "netdev" "firezone-client"];
 
   # Sing-box VPN service (temporarily disabled - using throne instead)
   systemd.services.sing-box = {
@@ -315,7 +316,6 @@ in {
     xremap
     wl-clipboard
     docker-compose
-    qemu
     typst
     hiddify-app
     # throne

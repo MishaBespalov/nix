@@ -432,9 +432,9 @@
         # Tab management (replaces Zellij tabs)
         "alt+right=next_tab" # Next tab
         "alt+left=previous_tab" # Previous tab
-        "alt+4=new_tab" # New tab
+        "alt+n=new_tab" # New tab
 
-        "alt+5=close_tab" # Close tab
+        "alt+q=close_tab" # Close tab
       ];
     };
   };

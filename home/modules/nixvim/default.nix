@@ -689,13 +689,13 @@
         };
       }
 
-      # Task cycling functionality for markdown checkboxes
+      # Search recent buffers
       {
         mode = "n";
-        key = "<CR>";
-        action = "<cmd>lua CycleMarkdownTask()<CR>";
+        key = "<leader>br";
+        action = "<cmd>FzfLua oldfiles<CR>";
         options = {
-          desc = "Cycle through task states or normal Enter";
+          desc = "Search recent buffers";
           silent = true;
         };
       }
@@ -953,38 +953,6 @@
 
       -- Custom Kubernetes snippets
       luasnip.add_snippets("yaml", {
-        s("k8s-deployment", {
-          t({"apiVersion: apps/v1", "kind: Deployment", "metadata:", "  name: "}), i(1, "app-name"),
-          t({"", "  namespace: "}), i(2, "default"),
-          t({"", "spec:", "  replicas: "}), i(3, "3"),
-          t({"", "  selector:", "    matchLabels:", "      app: "}), f(function(args) return args[1][1] end, {1}),
-          t({"", "  template:", "    metadata:", "      labels:", "        app: "}), f(function(args) return args[1][1] end, {1}),
-          t({"", "    spec:", "      containers:", "      - name: "}), f(function(args) return args[1][1] end, {1}),
-          t({"", "        image: "}), i(4, "nginx:latest"),
-          t({"", "        ports:", "        - containerPort: "}), i(5, "80"),
-        }),
-
-        s("k8s-service", {
-          t({"apiVersion: v1", "kind: Service", "metadata:", "  name: "}), i(1, "app-service"),
-          t({"", "  namespace: "}), i(2, "default"),
-          t({"", "spec:", "  selector:", "    app: "}), i(3, "app-name"),
-          t({"", "  ports:", "  - port: "}), i(4, "80"),
-          t({"", "    targetPort: "}), i(5, "80"),
-          t({"", "    protocol: TCP", "  type: "}), i(6, "ClusterIP"),
-        }),
-
-        s("k8s-configmap", {
-          t({"apiVersion: v1", "kind: ConfigMap", "metadata:", "  name: "}), i(1, "app-config"),
-          t({"", "  namespace: "}), i(2, "default"),
-          t({"", "data:", "  "}), i(3, "config.yaml"), t({": |", "    "}), i(4, "# configuration content"),
-        }),
-
-        s("k8s-secret", {
-          t({"apiVersion: v1", "kind: Secret", "metadata:", "  name: "}), i(1, "app-secret"),
-          t({"", "  namespace: "}), i(2, "default"),
-          t({"", "type: Opaque", "data:", "  "}), i(3, "password"), t({": "}), i(4, "# base64 encoded value"),
-        }),
-
         s("systemd-service", {
           t({"[Unit]", "Description="}), i(1, "My Service"),
           t({"", "After="}), i(2, "network.target"),
@@ -994,25 +962,6 @@
           t({"", "Restart="}), i(6, "always"),
           t({"", "RestartSec="}), i(7, "10"),
           t({"", "", "[Install]", "WantedBy="}), i(8, "multi-user.target"),
-        }),
-
-        -- Ansible snippets
-        s("ansible-playbook", {
-          t({"---", "- name: "}), i(1, "Playbook description"),
-          t({"", "  hosts: "}), i(2, "all"),
-          t({"", "  become: "}), i(3, "yes"),
-          t({"", "  vars:", "    "}), i(4, "variable_name"), t({": "}), i(5, "value"),
-          t({"", "  tasks:", "    - name: "}), i(6, "Task description"),
-          t({"", "      "}), i(7, "module_name"), t({":"}),
-          t({"", "        "}), i(8, "parameter"), t({": "}), i(9, "value"),
-        }),
-
-        s("ansible-task", {
-          t({"- name: "}), i(1, "Task description"),
-          t({"", "  "}), i(2, "module_name"), t({":"}),
-          t({"", "    "}), i(3, "parameter"), t({": "}), i(4, "value"),
-          t({"", "  when: "}), i(5, "condition"),
-          t({"", "  notify: "}), i(6, "handler_name"),
         }),
       })
 
@@ -1262,70 +1211,6 @@
         vim.cmd("redraw!")
         print("Unused variable colors fixed!")
       end, {})
-
-      -- Task cycling function
-      function CycleMarkdownTask()
-        -- Only work in markdown files
-        if vim.bo.filetype ~= "markdown" then
-          vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<CR>", true, false, true), "n", false)
-          return
-        end
-
-        local line = vim.api.nvim_get_current_line()
-        local row = vim.api.nvim_win_get_cursor(0)[1]
-
-        -- Debug: print the current line and filetype
-        print("Function called! Filetype: " .. vim.bo.filetype)
-        print("Current line: '" .. line .. "'")
-
-        -- Kanban task state cycling patterns
-        local task_patterns = {
-          { pattern = "^(%s*)- %[ %](.*)$", replacement = "%1- [>]%2" },  -- unchecked -> todo
-          { pattern = "^(%s*)- %[>%](.*)$", replacement = "%1- [/]%2" },  -- todo -> in progress
-          { pattern = "^(%s*)- %[/%](.*)$", replacement = "%1- [r]%2" },  -- in progress -> review
-          { pattern = "^(%s*)- %[r%](.*)$", replacement = "%1- [x]%2" },  -- review -> checked
-          { pattern = "^(%s*)- %[x%](.*)$", replacement = "%1- [h]%2" },  -- checked -> hold
-          { pattern = "^(%s*)- %[h%](.*)$", replacement = "%1- [b]%2" },  -- hold -> blocked
-          { pattern = "^(%s*)- %[b%](.*)$", replacement = "%1- [!]%2" },  -- blocked -> urgent
-          { pattern = "^(%s*)- %[!%](.*)$", replacement = "%1- [?]%2" },  -- urgent -> note
-          { pattern = "^(%s*)- %[?%](.*)$", replacement = "%1- [~]%2" }, -- note -> cancelled
-          { pattern = "^(%s*)- %[~%](.*)$", replacement = "%1- [ ]%2" },  -- cancelled -> unchecked
-        }
-
-        local updated = false
-        for i, task in ipairs(task_patterns) do
-          local new_line = line:gsub(task.pattern, task.replacement)
-          print("Pattern " .. i .. ": '" .. task.pattern .. "' -> result: '" .. new_line .. "'")
-          if new_line ~= line then
-            print("MATCH! Updating line to: '" .. new_line .. "'")
-            vim.api.nvim_buf_set_lines(0, row - 1, row, false, { new_line })
-            updated = true
-            -- Keep cursor position roughly the same
-            local col = vim.api.nvim_win_get_cursor(0)[2]
-            vim.api.nvim_win_set_cursor(0, {row, math.min(col, #new_line - 1)})
-            break
-          end
-        end
-
-        -- If no task pattern matched, check if we're on a line that could become a task
-        if not updated then
-          print("No pattern matched, checking for conversion...")
-          -- Check if line starts with "- " but isn't a task yet
-          local indent, content = line:match("^(%s*)%- (.*)$")
-          print("Indent: '" .. (indent or "nil") .. "', Content: '" .. (content or "nil") .. "'")
-          if indent and content then
-            local new_line = indent .. "- [ ] " .. content
-            print("Converting to task: '" .. new_line .. "'")
-            vim.api.nvim_buf_set_lines(0, row - 1, row, false, { new_line })
-            local col = vim.api.nvim_win_get_cursor(0)[2]
-            vim.api.nvim_win_set_cursor(0, {row, math.min(col + 4, #new_line - 1)})
-          else
-            print("No conversion possible, doing normal Enter")
-            -- Normal Enter behavior for non-list items
-            vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<CR>", true, false, true), "n", false)
-          end
-        end
-      end
 
     '';
 
