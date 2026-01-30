@@ -609,9 +609,14 @@
       {
         mode = "n";
         key = "<leader>sg";
-        action = "<cmd>FzfLua live_grep<CR>";
+        action.__raw = ''
+          function()
+            local root = _G.project_root()
+            require("fzf-lua").live_grep({ cwd = root })
+          end
+        '';
         options = {
-          desc = "Live grep in project";
+          desc = "Live grep in project (git root)";
           silent = true;
         };
       }

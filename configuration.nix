@@ -263,7 +263,7 @@ in {
       Type = "simple";
       Restart = "always";
       RestartSec = "5";
-      ExecStart = "${pkgs.sing-box}/bin/sing-box run -c /home/misha/sing-box/germany-sirius.json";
+      ExecStart = "${pkgs.sing-box}/bin/sing-box run -c /home/misha/sing-box/finland.json";
       User = "root";
       Group = "root";
     };
@@ -318,7 +318,7 @@ in {
     docker-compose
     typst
     hiddify-app
-    # throne
+    throne
   ];
 
   fonts.packages = with pkgs; [

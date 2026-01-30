@@ -434,7 +434,7 @@
         "alt+left=previous_tab" # Previous tab
         "alt+n=new_tab" # New tab
 
-        "alt+q=close_tab" # Close tab
+        "alt+d=close_tab" # Close tab
       ];
     };
   };

@@ -64,6 +64,7 @@ in {
       pdftk
       thttpd
       nftables
+      cbonsai
       jq
       conntrack-tools
       openssl
@@ -126,6 +127,9 @@ in {
       # Screen recording
       obs-studio
       vlc
+
+      # AI
+      tts
 
       # Python package management
       uv
