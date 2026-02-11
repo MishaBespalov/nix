@@ -193,13 +193,13 @@
     '';
 
     # Automated Rust workspace creation with full setup
-    functions.rust-new-workspace.body = ''
+    functions.cargo-workspace.body = ''
       set workspace_name $argv[1]
       set crates $argv[2..-1]
 
       if test -z "$workspace_name"
-        echo "Usage: rust-new-workspace <workspace-name> [crate1] [crate2] ..."
-        echo "Example: rust-new-workspace myproject common agent api"
+        echo "Usage: cargo-workspace <workspace-name> [crate1] [crate2] ..."
+        echo "Example: cargo-workspace myproject common agent api"
         return 1
       end
 

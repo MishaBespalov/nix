@@ -74,6 +74,8 @@ in {
       beep
       hiddify-app
       traceroute
+      csvlens
+      bandwhich
       awscli2
       alsa-utils
       nixos-generators
@@ -101,6 +103,7 @@ in {
       unzip
       libarchive
       grpcurl
+      asciiquarium
       bind
       nemo
       gnumake

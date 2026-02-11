@@ -1,14 +1,15 @@
 {
   pkgs,
   inputs,
-  ...}: {
+  ...
+}: {
   services.hyprsunset = {
     enable = true; # start as a user service on login
 
     transitions = {
       # Apply warm profile every night at 22:00
       night = {
-        calendar = "*-*-* 21:30:00";
+        calendar = "*-*-* 23:30:00";
         requests = [
           ["temperature" "2500"] # lower = warmer
           # [ "gamma" "85" ]         # optional: 85% perceived brightness
