@@ -269,6 +269,12 @@ in {
     };
   };
 
+  programs.steam = {
+    enable = true;
+    remotePlay.openFirewall = true;
+    dedicatedServer.openFirewall = true;
+  };
+
   programs.hyprland.enable = true;
   programs.fish.enable = true;
   programs.direnv.enable = true;

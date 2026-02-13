@@ -5,11 +5,7 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
 
-    ghostty = {
-      url = "github:ghostty-org/ghostty";
-    };
-
-    zen-browser = {
+zen-browser = {
       url = "github:0xc000022070/zen-browser-flake";
     };
 
