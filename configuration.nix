@@ -189,7 +189,11 @@ in {
       "--dpi-desync-ttl=6"
       "--dpi-desync-fooling=badsum,md5sig"
       "--dpi-desync-split-pos=1"
+      "--dpi-desync-any-protocol"
+      "--dpi-desync-repeats=6"
     ];
+    udpSupport = true;
+    udpPorts = ["50000:65535"];
   };
 
   services.prometheus.exporters.node = {
@@ -254,21 +258,21 @@ in {
   users.users.misha.extraGroups = ["wheel" "video" "audio" "input" "docker" "netdev" "firezone-client"];
 
   # Sing-box VPN service (temporarily disabled - using throne instead)
-  systemd.services.sing-box = {
-    description = "Sing-box proxy service";
-    after = ["network-online.target"];
-    wants = ["network-online.target"];
-    wantedBy = ["multi-user.target"];
-    serviceConfig = {
-      Type = "simple";
-      Restart = "always";
-      RestartSec = "5";
-      ExecStart = "${pkgs.sing-box}/bin/sing-box run -c /home/misha/sing-box/finland-routing.json";
-      User = "root";
-      Group = "root";
-    };
-  };
-
+  # systemd.services.sing-box = {
+  #   description = "Sing-box proxy service";
+  #   after = ["network-online.target"];
+  #   wants = ["network-online.target"];
+  #   wantedBy = ["multi-user.target"];
+  #   serviceConfig = {
+  #     Type = "simple";
+  #     Restart = "always";
+  #     RestartSec = "5";
+  #     ExecStart = "${pkgs.sing-box}/bin/sing-box run -c /home/misha/sing-box/latvia-routing.json";
+  #     User = "root";
+  #     Group = "root";
+  #   };
+  # };
+  #
   programs.steam = {
     enable = true;
     remotePlay.openFirewall = true;

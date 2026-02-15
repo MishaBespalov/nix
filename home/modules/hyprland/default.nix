@@ -120,11 +120,11 @@
         # Start waybar
         "waybar"
 
-        # "[workspace 1 silent] throne"
+        "[workspace 1 silent] throne"
         # "[workspace 2 silent] spotify"
-        "[workspace 1 silent] telegram-desktop"
-        "[workspace 2 silent] zen"
-        "[workspace 3 silent] ghostty"
+        "[workspace 2 silent] telegram-desktop"
+        "[workspace 3 silent] zen"
+        "[workspace 4 silent] ghostty"
       ];
 
       bind = [
