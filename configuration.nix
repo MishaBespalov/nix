@@ -89,6 +89,8 @@ in {
   boot.loader.efi.canTouchEfiVariables = true;
 
   networking.hostName = "nixos-btw"; # Define your hostname.
+  networking.firewall.allowedTCPPorts = [ 19160 ];
+  networking.firewall.allowedUDPPorts = [ 19160 ];
   networking.networkmanager.enable = true; # Easiest to use and most distros use this by default.
   networking.networkmanager.dns = "systemd-resolved";
   networking.networkmanager.plugins = with pkgs; [
@@ -267,12 +269,12 @@ in {
   #     Type = "simple";
   #     Restart = "always";
   #     RestartSec = "5";
-  #     ExecStart = "${pkgs.sing-box}/bin/sing-box run -c /home/misha/sing-box/latvia-routing.json";
+  #     ExecStart = "${pkgs.sing-box}/bin/sing-box run -c /home/misha/sing-box/finland-routing.json";
   #     User = "root";
   #     Group = "root";
   #   };
   # };
-  #
+
   programs.steam = {
     enable = true;
     remotePlay.openFirewall = true;
@@ -329,6 +331,8 @@ in {
     typst
     hiddify-app
     throne
+    webtorrent_desktop
+    qbittorrent
   ];
 
   fonts.packages = with pkgs; [

@@ -32,6 +32,9 @@ in {
       bacon
       nil
       chromium
+      anki
+      mpv
+      mkvtoolnix
       zip
       discord # Discord client
       betterdiscordctl # BetterDiscord management tool
