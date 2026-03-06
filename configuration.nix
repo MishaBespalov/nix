@@ -4,6 +4,32 @@
   pkgs,
   ...
 }: let
+  byedpi = pkgs.stdenv.mkDerivation rec {
+    pname = "byedpi";
+    version = "0.14.1";
+
+    src = pkgs.fetchFromGitHub {
+      owner = "hufrea";
+      repo = "byedpi";
+      rev = "v${version}";
+      sha256 = "sha256-JdL+3ETNxaEtOLUhgLSABL9C8w/EM4Ay37OXU5jLCFA=";
+    };
+
+    makeFlags = ["PREFIX=$(out)"];
+
+    installPhase = ''
+      mkdir -p $out/bin
+      cp ciadpi $out/bin/
+    '';
+
+    meta = with lib; {
+      description = "Local SOCKS proxy for DPI bypass";
+      homepage = "https://github.com/hufrea/byedpi";
+      license = licenses.mit;
+      platforms = platforms.linux;
+    };
+  };
+
   throne = pkgs.stdenv.mkDerivation rec {
     pname = "throne";
     version = "1.0.13";
@@ -63,7 +89,14 @@
       cd "\$DATA_DIR"
       export LD_LIBRARY_PATH="${pkgs.openssl.out}/lib:\$LD_LIBRARY_PATH"
       export SHELL=/run/current-system/sw/bin/bash
-      exec "\$DATA_DIR/Throne" "\$@"
+      exec ${pkgs.proxychains-ng}/bin/proxychains4 -f ${pkgs.writeText "proxychains.conf" ''
+        localnet 127.0.0.0/255.0.0.0
+        localnet 10.0.0.0/255.0.0.0
+        localnet 172.16.0.0/255.240.0.0
+        localnet 192.168.0.0/255.255.0.0
+        [ProxyList]
+        socks5 127.0.0.1 1080
+      ''} "\$DATA_DIR/Throne" "\$@"
       WRAPPER
             chmod +x $out/bin/throne
     '';
@@ -89,8 +122,8 @@ in {
   boot.loader.efi.canTouchEfiVariables = true;
 
   networking.hostName = "nixos-btw"; # Define your hostname.
-  networking.firewall.allowedTCPPorts = [ 19160 ];
-  networking.firewall.allowedUDPPorts = [ 19160 ];
+  networking.firewall.allowedTCPPorts = [19160];
+  networking.firewall.allowedUDPPorts = [19160];
   networking.networkmanager.enable = true; # Easiest to use and most distros use this by default.
   networking.networkmanager.dns = "systemd-resolved";
   networking.networkmanager.plugins = with pkgs; [
@@ -183,20 +216,65 @@ in {
 
   services.atd.enable = true;
 
-  # Zapret DPI bypass
-  services.zapret = {
-    enable = true;
-    params = [
-      "--dpi-desync=fake,disorder2"
-      "--dpi-desync-ttl=6"
-      "--dpi-desync-fooling=badsum,md5sig"
-      "--dpi-desync-split-pos=1"
-      "--dpi-desync-any-protocol"
-      "--dpi-desync-repeats=6"
-    ];
-    udpSupport = true;
-    udpPorts = ["50000:65535"];
-  };
+  # # ByeDPI - local SOCKS proxy for DPI bypass
+  # systemd.services.byedpi = {
+  #   description = "ByeDPI DPI bypass proxy";
+  #   after = ["network-online.target"];
+  #   wants = ["network-online.target"];
+  #   wantedBy = ["multi-user.target"];
+  #   serviceConfig = {
+  #     Type = "simple";
+  #     Restart = "always";
+  #     RestartSec = "5";
+  #     ExecStart = "${byedpi}/bin/ciadpi --port 1080 --disorder 1 --fake -1 --md5sig --auto=torst --tlsrec 1+s";
+  #     DynamicUser = true;
+  #   };
+  # };
+  #
+  # # Zapret DPI bypass
+  # services.zapret = {
+  #   enable = true;
+  #   params = [
+  #     "--dpi-desync=fake,disorder2"
+  #     "--dpi-desync-ttl=6"
+  #     "--dpi-desync-fooling=badsum,md5sig"
+  #     "--dpi-desync-split-pos=1"
+  #     "--dpi-desync-any-protocol"
+  #     "--dpi-desync-repeats=6"
+  #   ];
+  #   whitelist = [
+  #     # YouTube
+  #     "youtube.com"
+  #     "googlevideo.com"
+  #     "ytimg.com"
+  #     "youtu.be"
+  #     "ggpht.com"
+  #     "googleapis.com"
+  #     "googleusercontent.com"
+  #     "gstatic.com"
+  #     # Discord
+  #     "discord.com"
+  #     "discord.gg"
+  #     "discordapp.com"
+  #     "discordapp.net"
+  #     "discord.media"
+  #     "discordcdn.com"
+  #     # Telegram
+  #     "telegram.org"
+  #     "t.me"
+  #     "telegram.me"
+  #     # Other commonly blocked
+  #     "facebook.com"
+  #     "instagram.com"
+  #     "twitter.com"
+  #     "x.com"
+  #     "twimg.com"
+  #   ];
+  #   udpSupport = true;
+  #   udpPorts = ["50000:65535"];
+  # };
+
+  networking.firewall.checkReversePath = "loose";
 
   services.prometheus.exporters.node = {
     enable = true;

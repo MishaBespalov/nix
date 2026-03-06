@@ -48,6 +48,9 @@ in {
       nixpkgs-fmt
       inputs.nixpkgs-unstable.legacyPackages.${pkgs.system}.nodejs_24
       gcc
+      clang-tools # clangd, clang-format, clang-tidy
+      cmake
+      cmake-language-server
       webtorrent_desktop
       gdb
       htop
@@ -92,6 +95,9 @@ in {
       fd
       curlie
       zoxide
+      ghc
+      cabal-install
+      haskell-language-server
       eza
       bat
       fzf

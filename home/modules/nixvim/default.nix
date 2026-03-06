@@ -269,6 +269,8 @@
             go = ["gofumpt" "goimports"];
             yaml = ["prettier"];
             json = ["prettier"];
+            c = ["clang-format"];
+            cpp = ["clang-format"];
             zig = ["zigfmt"]; # uses zig fmt
             rust = ["rustfmt"];
             dockerfile = ["hadolint"];
@@ -344,8 +346,11 @@
               };
             };
           };
+          clangd.enable = true;
+          cmake.enable = true;
           dockerls.enable = true;
           helm_ls.enable = true;
+          hls.enable = true;
           gopls = {
             enable = true;
             settings = {
@@ -404,6 +409,10 @@
       golangci-lint # optional, for heavy linting outside LSP
       lazygit
       wl-clipboard
+
+      # C/C++ tooling
+      clang-tools # clangd + clang-format
+      cmake-language-server
 
       # Formatters (used by :LspFormat or plugins like conform/formatter of choice)
       stylua
