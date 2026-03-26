@@ -201,6 +201,11 @@ in {
 
   hardware.uinput.enable = true;
 
+  # Vial keyboard configurator - allow access to hidraw devices
+  services.udev.extraRules = ''
+    KERNEL=="hidraw*", SUBSYSTEM=="hidraw", MODE="0660", GROUP="users", TAG+="uaccess", TAG+="udev-acl"
+  '';
+
   # For the GUI client
   services.firezone.gui-client = {
     enable = true;
@@ -409,8 +414,11 @@ in {
     typst
     hiddify-app
     throne
+    v2rayn
+    xray
     webtorrent_desktop
     qbittorrent
+    vial
   ];
 
   fonts.packages = with pkgs; [

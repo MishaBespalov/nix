@@ -36,6 +36,8 @@ in {
       mpv
       mkvtoolnix
       zip
+      vial
+      usbutils
       discord # Discord client
       betterdiscordctl # BetterDiscord management tool
       openvpn # OpenVPN CLI
@@ -52,6 +54,7 @@ in {
       cmake
       cmake-language-server
       webtorrent_desktop
+      qmk
       gdb
       htop
       postgresql_17 # provides `psql`

@@ -432,6 +432,12 @@
     keymaps = [
       {
         mode = "n";
+        key = "<Tab>";
+        action = "a";
+        options.silent = true;
+      }
+      {
+        mode = "n";
         key = "xx";
         action = "\"+dd";
         options.silent = true;
