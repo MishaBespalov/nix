@@ -9,7 +9,7 @@
     transitions = {
       # Apply warm profile every night at 22:00
       night = {
-        calendar = "*-*-* 23:30:00";
+        calendar = "*-*-* 22:30:00";
         requests = [
           ["temperature" "2500"] # lower = warmer
           # [ "gamma" "85" ]         # optional: 85% perceived brightness
