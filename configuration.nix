@@ -230,14 +230,9 @@ in {
 
   # For the GUI client
   services.firezone.gui-client = {
-    enable = false;
+    enable = true;
     name = "kts";
   };
-
-  # Happ proxy daemon (TUN-based, Xray/sing-box core).
-  # Conflicts with firezone-gui-client over the default route, so keep
-  # exactly one of the two enabled at a time.
-  services.happd.enable = true;
 
   # services.firezone.headless-client = {
   #   enable = true;
@@ -307,16 +302,6 @@ in {
   # };
 
   networking.firewall.checkReversePath = "loose";
-
-  # Clamp TCP MSS to path MTU — prevents TLS handshake timeouts over VPN/TUN
-  networking.firewall.extraCommands = ''
-    iptables -t mangle -A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
-    iptables -t mangle -A OUTPUT -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
-  '';
-  networking.firewall.extraStopCommands = ''
-    iptables -t mangle -D FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu || true
-    iptables -t mangle -D OUTPUT -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu || true
-  '';
 
   services.prometheus.exporters.node = {
     enable = true;
