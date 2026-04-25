@@ -32,7 +32,7 @@
 
   throne = pkgs.stdenv.mkDerivation rec {
     pname = "throne";
-    version = "1.0.13";
+    version = "1.1.2";
 
     src = pkgs.fetchurl {
       url = "https://github.com/throneproj/Throne/releases/download/${version}/Throne-${version}-linux-amd64.zip";
@@ -105,6 +105,28 @@
       description = "Cross-platform GUI proxy utility (Nekoray fork)";
       homepage = "https://github.com/throneproj/Throne";
       license = licenses.gpl3;
+      platforms = ["x86_64-linux"];
+    };
+  };
+  codecrafters-cli = pkgs.stdenv.mkDerivation rec {
+    pname = "codecrafters-cli";
+    version = "53";
+
+    src = pkgs.fetchurl {
+      url = "https://github.com/codecrafters-io/cli/releases/download/v${version}/v${version}_linux_amd64.tar.gz";
+      sha256 = "sha256-tpHOyEmJIXDUtFTAxnu/z6ZHarOCKzd/qKz89R8qLL0=";
+    };
+
+    sourceRoot = ".";
+
+    installPhase = ''
+      mkdir -p $out/bin
+      cp codecrafters $out/bin/
+    '';
+
+    meta = with lib; {
+      description = "CodeCrafters CLI to run tests";
+      homepage = "https://github.com/codecrafters-io/cli";
       platforms = ["x86_64-linux"];
     };
   };
@@ -208,9 +230,14 @@ in {
 
   # For the GUI client
   services.firezone.gui-client = {
-    enable = true;
+    enable = false;
     name = "kts";
   };
+
+  # Happ proxy daemon (TUN-based, Xray/sing-box core).
+  # Conflicts with firezone-gui-client over the default route, so keep
+  # exactly one of the two enabled at a time.
+  services.happd.enable = true;
 
   # services.firezone.headless-client = {
   #   enable = true;
@@ -280,6 +307,16 @@ in {
   # };
 
   networking.firewall.checkReversePath = "loose";
+
+  # Clamp TCP MSS to path MTU — prevents TLS handshake timeouts over VPN/TUN
+  networking.firewall.extraCommands = ''
+    iptables -t mangle -A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
+    iptables -t mangle -A OUTPUT -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
+  '';
+  networking.firewall.extraStopCommands = ''
+    iptables -t mangle -D FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu || true
+    iptables -t mangle -D OUTPUT -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu || true
+  '';
 
   services.prometheus.exporters.node = {
     enable = true;
@@ -358,12 +395,6 @@ in {
   #   };
   # };
 
-  programs.steam = {
-    enable = true;
-    remotePlay.openFirewall = true;
-    dedicatedServer.openFirewall = true;
-  };
-
   programs.hyprland.enable = true;
   programs.fish.enable = true;
   programs.direnv.enable = true;
@@ -419,6 +450,7 @@ in {
     webtorrent_desktop
     qbittorrent
     vial
+    codecrafters-cli
   ];
 
   fonts.packages = with pkgs; [

@@ -8,13 +8,14 @@
     paths = [inputs.zen-browser.packages.${pkgs.system}.twilight];
     buildInputs = [pkgs.makeWrapper];
     postBuild = ''
-      wrapProgram $out/bin/zen \
+      wrapProgram $out/bin/zen-twilight \
         --prefix LD_LIBRARY_PATH : "${pkgs.lib.makeLibraryPath [
         pkgs.pipewire
         pkgs.pulseaudio
         pkgs.alsa-lib
         pkgs.ffmpeg
       ]}"
+      ln -s $out/bin/zen-twilight $out/bin/zen
     '';
   };
 in {
@@ -43,6 +44,7 @@ in {
       openvpn # OpenVPN CLI
       openconnect # AnyConnect/GlobalProtect-compatible CLI
       wireguard-tools # wg / wg-quick utilities
+      websocat # WebSocket cat (ws:// / wss:// client)
       telegram-desktop
       whatsapp-for-linux
       kdePackages.dolphin
@@ -55,6 +57,7 @@ in {
       cmake-language-server
       webtorrent_desktop
       qmk
+      ipcalc
       gdb
       htop
       postgresql_17 # provides `psql`
