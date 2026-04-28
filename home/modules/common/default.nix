@@ -131,6 +131,7 @@ in {
       minikube
       kubectl
       kubernetes-helm
+      kubebuilder
 
       # DevOps/Infrastructure tools
       yamllint

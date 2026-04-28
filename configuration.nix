@@ -36,7 +36,7 @@
 
     src = pkgs.fetchurl {
       url = "https://github.com/throneproj/Throne/releases/download/${version}/Throne-${version}-linux-amd64.zip";
-      sha256 = "0pb9ds6xhkm8b0ldpk9537j4b7xic66phkcd2p61s89pkxs7zc03";
+      sha256 = "sha256-GYDlyCyPxyeUtHPxvy5KIGJF/kC8zlLN5h3GBoH0dgM=";
     };
 
     nativeBuildInputs = with pkgs; [
