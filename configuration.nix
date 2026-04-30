@@ -345,6 +345,21 @@ in {
     # rootless.enable = true;      # uncomment for rootless mode (see note below)
   };
 
+  virtualisation.libvirtd = {
+    enable = true;
+    qemu = {
+      package = pkgs.qemu_kvm; # KVM-accelerated QEMU
+      runAsRoot = false;
+      swtpm.enable = true; # virtual TPM, useful for modern guests
+      ovmf = {
+        enable = true;
+        packages = [pkgs.OVMFFull.fd]; # UEFI firmware for guests
+      };
+    };
+  };
+
+  programs.virt-manager.enable = true;
+
   # TUN/TAP support for nekoray
   boot.kernel.sysctl = {
     "net.ipv4.ip_forward" = 1;
@@ -362,7 +377,7 @@ in {
   virtualisation.waydroid.enable = true;
 
   # Add user to netdev group for TUN access
-  users.users.misha.extraGroups = ["wheel" "video" "audio" "input" "docker" "netdev" "firezone-client"];
+  users.users.misha.extraGroups = ["wheel" "video" "audio" "input" "docker" "netdev" "firezone-client" "libvirtd" "kvm"];
 
   # Sing-box VPN service (temporarily disabled - using throne instead)
   # systemd.services.sing-box = {

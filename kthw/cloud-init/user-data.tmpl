@@ -1,0 +1,53 @@
+#cloud-config
+# Cloud-init NoCloud user-data template.
+# Placeholders @HOSTNAME@ and @SSHKEY@ are substituted by provision.sh.
+
+hostname: @HOSTNAME@
+fqdn: @HOSTNAME@.kubernetes.local
+manage_etc_hosts: true
+preserve_hostname: false
+
+users:
+  - name: misha
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    groups: [sudo, adm]
+    shell: /bin/bash
+    lock_passwd: true
+    ssh_authorized_keys:
+      - @SSHKEY@
+
+ssh_pwauth: false
+disable_root: true
+
+# Force IPv4 for apt and glibc resolvers. The libvirt 'kthw' network is
+# IPv4-only, but DNS returns AAAA records (deb.debian.org is dual-stack);
+# without these, apt picks IPv6, opens a socket with no route, and stalls.
+# write_files runs in the 'config' stage, before package-update in 'final'.
+write_files:
+  - path: /etc/apt/apt.conf.d/99-force-ipv4
+    permissions: '0644'
+    content: |
+      Acquire::ForceIPv4 "true";
+  - path: /etc/gai.conf
+    permissions: '0644'
+    content: |
+      precedence ::ffff:0:0/96  100
+
+package_update: true
+package_upgrade: false
+packages:
+  - openssh-server
+  - curl
+  - wget
+  - vim-nox
+  - tmux
+  - bash-completion
+  - ca-certificates
+  - gnupg
+  - lsb-release
+  - netcat-openbsd
+  - dnsutils
+
+# Drop a marker so we can tell if cloud-init finished without journalctl-spelunking.
+runcmd:
+  - [ sh, -c, 'echo "cloud-init done at $(date -Iseconds)" > /etc/kthw-ready' ]

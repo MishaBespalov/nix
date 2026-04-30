@@ -1,0 +1,22 @@
+<network>
+  <name>kthw</name>
+  <forward mode='nat'>
+    <nat>
+      <port start='1024' end='65535'/>
+    </nat>
+  </forward>
+  <bridge name='virbr-kthw' stp='on' delay='0'/>
+  <domain name='kubernetes.local' localOnly='no'/>
+  <ip address='10.0.0.254' netmask='255.255.255.0'>
+    <dhcp>
+      <range start='10.0.0.100' end='10.0.0.200'/>
+      <host mac='52:54:00:11:00:01' name='jumpbox'  ip='10.0.0.1'/>
+      <host mac='52:54:00:11:00:02' name='server-0' ip='10.0.0.2'/>
+      <host mac='52:54:00:11:00:03' name='server-1' ip='10.0.0.3'/>
+      <host mac='52:54:00:11:00:04' name='server-2' ip='10.0.0.4'/>
+      <host mac='52:54:00:11:00:05' name='node-0'   ip='10.0.0.5'/>
+      <host mac='52:54:00:11:00:06' name='node-1'   ip='10.0.0.6'/>
+      <host mac='52:54:00:11:00:07' name='lb-0'     ip='10.0.0.7'/>
+    </dhcp>
+  </ip>
+</network>

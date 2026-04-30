@@ -1,0 +1,34 @@
+# SSH config for the KTHW lab.
+# Use directly:    ssh -F /home/misha/nixos-dotfiles/kthw/ssh-config jumpbox
+# Or include from ~/.ssh/config:
+#   Include /home/misha/nixos-dotfiles/kthw/ssh-config
+
+Host jumpbox kthw-jumpbox
+  HostName 10.0.0.1
+
+Host server-0 kthw-server-0
+  HostName 10.0.0.2
+
+Host server-1 kthw-server-1
+  HostName 10.0.0.3
+
+Host server-2 kthw-server-2
+  HostName 10.0.0.4
+
+Host node-0 kthw-node-0
+  HostName 10.0.0.5
+
+Host node-1 kthw-node-1
+  HostName 10.0.0.6
+
+Host lb-0 kthw-lb-0
+  HostName 10.0.0.7
+
+Host jumpbox server-* node-* lb-* kthw-*
+  User misha
+  IdentityFile ~/.ssh/kthw_ed25519
+  IdentitiesOnly yes
+  StrictHostKeyChecking no
+  UserKnownHostsFile /dev/null
+  LogLevel ERROR
+  ServerAliveInterval 30

@@ -36,6 +36,7 @@ in {
       anki
       mpv
       mkvtoolnix
+      cloud-utils
       zip
       vial
       usbutils
