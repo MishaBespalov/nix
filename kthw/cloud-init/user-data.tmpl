@@ -4,7 +4,9 @@
 
 hostname: @HOSTNAME@
 fqdn: @HOSTNAME@.kubernetes.local
-manage_etc_hosts: true
+# Don't let cloud-init manage /etc/hosts — we add KTHW cluster entries
+# (server-N, node-N, lb-0) and want them to survive reboots.
+manage_etc_hosts: false
 preserve_hostname: false
 
 users:
@@ -17,7 +19,9 @@ users:
       - @SSHKEY@
 
 ssh_pwauth: false
-disable_root: true
+# Allow key-based root SSH (Debian's sshd default is prohibit-password).
+# KTHW v1.32 commands assume `ssh root@<host>` works everywhere.
+disable_root: false
 
 # Force IPv4 for apt and glibc resolvers. The libvirt 'kthw' network is
 # IPv4-only, but DNS returns AAAA records (deb.debian.org is dual-stack);
@@ -32,6 +36,11 @@ write_files:
     permissions: '0644'
     content: |
       precedence ::ffff:0:0/96  100
+  - path: /root/.ssh/authorized_keys
+    permissions: '0600'
+    owner: root:root
+    content: |
+      @SSHKEY@
 
 package_update: true
 package_upgrade: false
@@ -50,4 +59,6 @@ packages:
 
 # Drop a marker so we can tell if cloud-init finished without journalctl-spelunking.
 runcmd:
+  # write_files creates /root/.ssh at 0755; sshd needs 0700 or it ignores the file.
+  - [ chmod, '0700', /root/.ssh ]
   - [ sh, -c, 'echo "cloud-init done at $(date -Iseconds)" > /etc/kthw-ready' ]
