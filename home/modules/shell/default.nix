@@ -413,12 +413,11 @@
       background = "#1f1f1f";
       background-opacity = 1;
       selection-clear-on-typing = false;
-      copy-on-select = true;
       clipboard-trim-trailing-spaces = true;
       gtk-wide-tabs = false;
       shell-integration = "fish";
       cursor-color = "#458588";
-      # copy-on-select = "clipboard";
+      copy-on-select = "clipboard";
       gtk-tabs-location = "bottom";
       gtk-custom-css = "/home/misha/nixos-dotfiles/home/modules/shell/ghostty-gruvbox-tabs.css";
 
