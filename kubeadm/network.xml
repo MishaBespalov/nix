@@ -1,0 +1,20 @@
+<network>
+  <name>kubeadm</name>
+  <forward mode='nat'>
+    <nat>
+      <port start='1024' end='65535'/>
+    </nat>
+  </forward>
+  <bridge name='virbr-kadm' stp='on' delay='0'/>
+  <domain name='kubeadm.local' localOnly='no'/>
+  <ip address='10.0.1.254' netmask='255.255.255.0'>
+    <dhcp>
+      <range start='10.0.1.100' end='10.0.1.200'/>
+      <host mac='52:54:00:22:00:11' name='cp-0' ip='10.0.1.11'/>
+      <host mac='52:54:00:22:00:12' name='cp-1' ip='10.0.1.12'/>
+      <host mac='52:54:00:22:00:13' name='cp-2' ip='10.0.1.13'/>
+      <host mac='52:54:00:22:00:21' name='wk-0' ip='10.0.1.21'/>
+      <host mac='52:54:00:22:00:22' name='wk-1' ip='10.0.1.22'/>
+    </dhcp>
+  </ip>
+</network>

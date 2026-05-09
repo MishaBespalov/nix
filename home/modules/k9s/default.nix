@@ -11,6 +11,14 @@
         ui = {
           skin = "gruvbox_dark";
         };
+        shellPod = {
+          image = "busybox:1.35.0";
+          namespace = "default";
+          limits = {
+            cpu = "100m";
+            memory = "100Mi";
+          };
+        };
       };
     };
 

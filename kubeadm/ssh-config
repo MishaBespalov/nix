@@ -1,0 +1,28 @@
+# SSH config for the kubeadm lab.
+# Use directly:    ssh -F /home/misha/nixos-dotfiles/kubeadm/ssh-config cp-0
+# Or include from ~/.ssh/config:
+#   Include /home/misha/nixos-dotfiles/kubeadm/ssh-config
+
+Host cp-0 kubeadm-cp-0
+  HostName 10.0.1.11
+
+Host cp-1 kubeadm-cp-1
+  HostName 10.0.1.12
+
+Host cp-2 kubeadm-cp-2
+  HostName 10.0.1.13
+
+Host wk-0 kubeadm-wk-0
+  HostName 10.0.1.21
+
+Host wk-1 kubeadm-wk-1
+  HostName 10.0.1.22
+
+Host cp-* wk-* kubeadm-*
+  User misha
+  IdentityFile ~/.ssh/kubeadm_ed25519
+  IdentitiesOnly yes
+  StrictHostKeyChecking no
+  UserKnownHostsFile /dev/null
+  LogLevel ERROR
+  ServerAliveInterval 30

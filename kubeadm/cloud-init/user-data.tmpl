@@ -1,0 +1,131 @@
+#cloud-config
+# Cloud-init NoCloud user-data template for kubeadm lab nodes.
+# Placeholders @HOSTNAME@ and @SSHKEY@ are substituted by provision.sh.
+#
+# By the time runcmd finishes, the node has containerd, kubeadm, kubelet,
+# kubectl (all v1.32.x, apt-pinned), required sysctls + modules, swap off,
+# kubeadm control-plane images pre-pulled, and a /etc/kubeadm-ready marker.
+
+hostname: @HOSTNAME@
+fqdn: @HOSTNAME@.kubeadm.local
+manage_etc_hosts: false
+preserve_hostname: false
+
+users:
+  - name: misha
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    groups: [sudo, adm]
+    shell: /bin/bash
+    lock_passwd: true
+    ssh_authorized_keys:
+      - @SSHKEY@
+
+ssh_pwauth: false
+disable_root: false
+
+write_files:
+  # Force IPv4 for apt + glibc (libvirt net is v4-only, mirrors are dual-stack).
+  - path: /etc/apt/apt.conf.d/99-force-ipv4
+    permissions: '0644'
+    content: |
+      Acquire::ForceIPv4 "true";
+  - path: /etc/gai.conf
+    permissions: '0644'
+    content: |
+      precedence ::ffff:0:0/96  100
+
+  - path: /root/.ssh/authorized_keys
+    permissions: '0600'
+    owner: root:root
+    content: |
+      @SSHKEY@
+
+  # Required kernel modules (loaded at boot via systemd-modules-load).
+  - path: /etc/modules-load.d/k8s.conf
+    permissions: '0644'
+    content: |
+      overlay
+      br_netfilter
+
+  # sysctls required by kubeadm preflight.
+  - path: /etc/sysctl.d/99-k8s.conf
+    permissions: '0644'
+    content: |
+      net.bridge.bridge-nf-call-iptables  = 1
+      net.bridge.bridge-nf-call-ip6tables = 1
+      net.ipv4.ip_forward                 = 1
+
+  # Disable swap permanently (kubelet refuses to start with swap on by default).
+  - path: /etc/systemd/system/disable-swap.service
+    permissions: '0644'
+    content: |
+      [Unit]
+      Description=Disable swap for kubelet
+      DefaultDependencies=no
+      Before=local-fs.target
+      [Service]
+      Type=oneshot
+      ExecStart=/sbin/swapoff -a
+      RemainAfterExit=yes
+      [Install]
+      WantedBy=local-fs.target
+
+package_update: true
+package_upgrade: false
+packages:
+  - openssh-server
+  - curl
+  - wget
+  - vim-nox
+  - tmux
+  - bash-completion
+  - ca-certificates
+  - gnupg
+  - lsb-release
+  - apt-transport-https
+  - netcat-openbsd
+  - dnsutils
+  - jq
+  - containerd
+
+runcmd:
+  - [ chmod, '0700', /root/.ssh ]
+
+  # ---- modules + sysctls + swap-off (now, not just at next boot) -----------
+  - [ modprobe, overlay ]
+  - [ modprobe, br_netfilter ]
+  - [ sysctl, --system ]
+  - [ swapoff, -a ]
+  - [ sed, -i, '/\sswap\s/s/^/#/', /etc/fstab ]
+  - [ systemctl, enable, disable-swap.service ]
+
+  # ---- containerd config: SystemdCgroup=true, pause:3.10 -------------------
+  - [ mkdir, -p, /etc/containerd ]
+  - sh -c 'containerd config default > /etc/containerd/config.toml'
+  - [ sed, -i, 's/SystemdCgroup = false/SystemdCgroup = true/', /etc/containerd/config.toml ]
+  - [ sed, -i, 's|sandbox_image = "registry.k8s.io/pause:3.8"|sandbox_image = "registry.k8s.io/pause:3.10"|', /etc/containerd/config.toml ]
+  # daemon-reload picks up the proxy.conf dropin written above before we restart.
+  - [ systemctl, daemon-reload ]
+  - [ systemctl, restart, containerd ]
+  - [ systemctl, enable, containerd ]
+
+  # ---- kubernetes apt repo (pkgs.k8s.io, v1.32 channel) --------------------
+  - [ mkdir, -p, /etc/apt/keyrings ]
+  - sh -c 'curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.32/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg'
+  - sh -c 'echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.32/deb/ /" > /etc/apt/sources.list.d/kubernetes.list'
+  - [ apt-get, update ]
+  - [ apt-get, install, -y, kubelet, kubeadm, kubectl ]
+  - [ apt-mark, hold, kubelet, kubeadm, kubectl ]
+  - [ systemctl, enable, --now, kubelet ]
+
+  # ---- pre-pull control-plane images (saves ~30s on bootstrap) -------------
+  - [ kubeadm, config, images, pull, --kubernetes-version, v1.32.0 ]
+
+  # ---- HARD verification: refuse to mark ready if anything is missing ------
+  # cloud-init's packages: block + runcmd both keep going on errors. Without
+  # this gate, a network blip silently produces a "ready" VM with no kubeadm.
+  # NB: must be the [sh,-c,'...'] array form — a bare-scalar `sh -c '...: ...'`
+  # makes YAML parse the line as a mapping (the colon-space) and cloud-init
+  # bails on shellify with TypeError, killing the entire runcmd block.
+  - [ sh, -c, 'for bin in containerd ctr crictl kubeadm kubelet kubectl; do command -v "$bin" >/dev/null || { echo "FATAL: $bin missing after install"; touch /etc/kubeadm-FAILED; exit 1; }; done' ]
+  - [ sh, -c, 'echo "cloud-init done at $(date -Iseconds)" > /etc/kubeadm-ready' ]

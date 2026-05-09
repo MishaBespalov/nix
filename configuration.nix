@@ -146,6 +146,10 @@ in {
   networking.hostName = "nixos-btw"; # Define your hostname.
   networking.firewall.allowedTCPPorts = [19160];
   networking.firewall.allowedUDPPorts = [19160];
+  # Lab VM bridges: trust them so libvirt-NATed traffic forwards out.
+  # Without this, the NixOS firewall's FORWARD chain drops TCP from these
+  # bridges (libvirt's own ACCEPT rules live in a separate hook).
+  networking.firewall.trustedInterfaces = [ "virbr-kadm" "virbr-kthw" ];
   networking.networkmanager.enable = true; # Easiest to use and most distros use this by default.
   networking.networkmanager.dns = "systemd-resolved";
   networking.networkmanager.plugins = with pkgs; [
@@ -451,6 +455,7 @@ in {
     qbittorrent
     vial
     codecrafters-cli
+    lsof
   ];
 
   fonts.packages = with pkgs; [
