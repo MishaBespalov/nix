@@ -32,6 +32,14 @@ ok "All 5 VMs reachable and cloud-init complete"
 # --- Templates ---------------------------------------------------------------
 
 render_kube_vip_manifest() {
+  # Heredoc is unquoted so ${KUBE_VIP_VERSION} / ${CONTROL_PLANE_VIP} expand.
+  # Keep the rest free of $ and backticks (they'd run as command substitutions).
+  # Why super-admin.conf and not admin.conf: in k8s 1.29+ kubeadm split these.
+  # admin.conf's user (kubernetes-admin) only gets cluster-admin via a CRB
+  # created late in kubeadm init. During wait-control-plane, kube-vip with
+  # admin.conf gets "leases.coordination.k8s.io forbidden", never claims the
+  # VIP, and init times out. super-admin.conf's user is in system:masters
+  # (hardcoded cluster-admin) so it works from the first second.
   cat <<EOF
 apiVersion: v1
 kind: Pod
@@ -59,16 +67,27 @@ spec:
     - { name: vip_renewdeadline,   value: "3" }
     - { name: vip_retryperiod,     value: "1" }
     - { name: address,             value: "${CONTROL_PLANE_VIP}" }
+    # kube-vip 0.8 requires a non-empty node identity for leader election
+    # ("ID cannot be empty" fatal otherwise). spec.nodeName is the canonical
+    # source for static pods; HOSTNAME alone isn't picked up.
+    - name: vip_nodename
+      valueFrom:
+        fieldRef:
+          fieldPath: spec.nodeName
     securityContext:
       capabilities:
         add: [NET_ADMIN, NET_RAW, SYS_TIME]
     volumeMounts:
+    # Container-side path is /etc/kubernetes/admin.conf because that is the
+    # default of kube-vip's --k8sConfigPath; if we put it elsewhere kube-vip
+    # falls back to in-cluster config (which does not exist yet) and dies.
+    # Host-side path is super-admin.conf — see comment above the heredoc.
     - { mountPath: /etc/kubernetes/admin.conf, name: kubeconfig }
   hostAliases:
   - { ip: 127.0.0.1, hostnames: [kubernetes] }
   volumes:
   - name: kubeconfig
-    hostPath: { path: /etc/kubernetes/admin.conf, type: FileOrCreate }
+    hostPath: { path: /etc/kubernetes/super-admin.conf, type: FileOrCreate }
 EOF
 }
 
@@ -149,6 +168,16 @@ ok "Join material ready"
 
 JOIN_CP="${JOIN_WORKER} --control-plane --certificate-key ${CERT_KEY}"
 
+# Pull cp-0's super-admin.conf so we can seed it on cp-1/cp-2 before kube-vip
+# starts there. `kubeadm join --control-plane` does NOT generate this file
+# (only `kubeadm init` does), and our kube-vip manifest's hostPath points at
+# it. Without seeding, kubelet would create an empty file via FileOrCreate
+# and kube-vip would crashloop with "no configuration has been provided".
+log "Fetching super-admin.conf from cp-0 for joiner seeding"
+scp -F "${KUBEADM_DIR}/ssh-config" -q \
+  "root@cp-0:/etc/kubernetes/super-admin.conf" "${CONFIG_DIR}/super-admin.conf"
+chmod 0600 "${CONFIG_DIR}/super-admin.conf"
+
 # --- Join cp-1 and cp-2 ------------------------------------------------------
 
 for cp in cp-1 cp-2; do
@@ -157,8 +186,13 @@ for cp in cp-1 cp-2; do
     continue
   fi
 
-  log "[${cp}] dropping kube-vip static-pod manifest"
+  log "[${cp}] seeding super-admin.conf (for kube-vip)"
   ssh_root "${cp}" 'mkdir -p /etc/kubernetes/manifests'
+  scp -F "${KUBEADM_DIR}/ssh-config" -q \
+    "${CONFIG_DIR}/super-admin.conf" "root@${cp}:/etc/kubernetes/super-admin.conf"
+  ssh_root "${cp}" 'chmod 0600 /etc/kubernetes/super-admin.conf'
+
+  log "[${cp}] dropping kube-vip static-pod manifest"
   scp -F "${KUBEADM_DIR}/ssh-config" -q \
     "${CONFIG_DIR}/kube-vip.yaml" "root@${cp}:/etc/kubernetes/manifests/kube-vip.yaml"
 
@@ -190,7 +224,10 @@ chmod 0600 "${KUBEADM_DIR}/admin.conf"
 # --- Install Calico CNI (idempotent: kubectl apply) -------------------------
 
 log "Installing Calico ${CALICO_VERSION} (operator + Installation CR)"
-ssh_root cp-0 "kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f https://raw.githubusercontent.com/projectcalico/calico/${CALICO_VERSION}/manifests/tigera-operator.yaml"
+# --server-side: tigera's Installation CRD schema is >256 KiB, which exceeds
+# the kubectl.kubernetes.io/last-applied-configuration annotation limit and
+# fails plain `kubectl apply`. SSA stores intent in managedFields, no annotation.
+ssh_root cp-0 "kubectl --kubeconfig=/etc/kubernetes/admin.conf apply --server-side --force-conflicts -f https://raw.githubusercontent.com/projectcalico/calico/${CALICO_VERSION}/manifests/tigera-operator.yaml"
 
 # Wait for the Installation CRD to exist before applying the CR.
 for i in {1..30}; do

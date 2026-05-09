@@ -103,7 +103,9 @@ runcmd:
   - [ mkdir, -p, /etc/containerd ]
   - sh -c 'containerd config default > /etc/containerd/config.toml'
   - [ sed, -i, 's/SystemdCgroup = false/SystemdCgroup = true/', /etc/containerd/config.toml ]
-  - [ sed, -i, 's|sandbox_image = "registry.k8s.io/pause:3.8"|sandbox_image = "registry.k8s.io/pause:3.10"|', /etc/containerd/config.toml ]
+  # Debian 12 ships containerd 1.6 whose default is pause:3.6, not 3.8 — match
+  # any pause version so we always end up on 3.10 (kubeadm 1.32 expects 3.10).
+  - [ sed, -i, -E, 's|sandbox_image = "registry.k8s.io/pause:[0-9.]+"|sandbox_image = "registry.k8s.io/pause:3.10"|', /etc/containerd/config.toml ]
   # daemon-reload picks up the proxy.conf dropin written above before we restart.
   - [ systemctl, daemon-reload ]
   - [ systemctl, restart, containerd ]
