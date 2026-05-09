@@ -78,8 +78,10 @@ kubectl get pods -A
    and **control-plane cert key** (`kubeadm init phase upload-certs --upload-certs`).
 4. **cp-1, cp-2**: drop kube-vip manifest, `kubeadm join --control-plane --certificate-key …`.
 5. **wk-0, wk-1**: `kubeadm join …` (worker form).
-6. **Calico**: apply `tigera-operator.yaml`, wait for the `Installation` CRD,
-   apply an `Installation` CR with `cidr: 10.244.0.0/16`.
+6. **Cilium**: install `cilium-cli` on cp-0, then `cilium install` with
+   `kubeProxyReplacement=true` and `routingMode=native` (all VMs are on one L2,
+   no encap needed). `kubeadm init` is run with `--skip-phases=addon/kube-proxy`
+   so kube-proxy is never installed — Cilium replaces it via eBPF.
 7. Copy `/etc/kubernetes/admin.conf` from cp-0 → `./admin.conf`.
 8. Wait for all 5 nodes to be `Ready`.
 
@@ -130,7 +132,7 @@ sudo virsh -c qemu:///system start kubeadm-cp-0
   `ssh root@cp-0 'crictl ps -a; journalctl -u kubelet --no-pager -n 100'`.
 - **VIP not pingable after init**: `ssh root@cp-0 'crictl ps | grep kube-vip'`.
   If absent, the static pod failed — check `crictl logs` of the kube-vip container.
-- **Workers stuck `NotReady`**: Calico pods crashlooping. `kubectl get pods -n calico-system`.
+- **Workers stuck `NotReady`**: Cilium agents not healthy yet. `kubectl -n kube-system get pods -l k8s-app=cilium` and `cilium status` on cp-0.
 - **IP conflicts** (e.g., other lab on 10.0.1.0/24): edit `network.xml`, `lib.sh`,
   `ssh-config` to a different /24, then `./destroy.sh && ./provision.sh && ./bootstrap.sh`.
 - **Want a clean cluster on the same VMs**: `ssh root@<node> 'kubeadm reset -f'`

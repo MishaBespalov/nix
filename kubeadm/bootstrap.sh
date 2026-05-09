@@ -150,7 +150,10 @@ else
     "${CONFIG_DIR}/kubeadm-cp-0.yaml" "root@cp-0:/root/kubeadm-config.yaml"
 
   log "[cp-0] kubeadm init (this is the slow step, ~60–90s)"
-  ssh_root cp-0 'kubeadm init --config=/root/kubeadm-config.yaml --upload-certs'
+  # --skip-phases=addon/kube-proxy: Cilium below replaces kube-proxy with its
+  # eBPF datapath. Skipping here avoids installing a kube-proxy DaemonSet we
+  # would only have to delete and means no iptables KUBE-* chains ever exist.
+  ssh_root cp-0 'kubeadm init --skip-phases=addon/kube-proxy --config=/root/kubeadm-config.yaml --upload-certs'
   ok "[cp-0] initialized"
 fi
 
@@ -221,49 +224,54 @@ scp -F "${KUBEADM_DIR}/ssh-config" -q "root@cp-0:/etc/kubernetes/admin.conf" "${
 # may also work from the host (libvirt NAT has return route). Keep VIP.
 chmod 0600 "${KUBEADM_DIR}/admin.conf"
 
-# --- Install Calico CNI (idempotent: kubectl apply) -------------------------
+# --- Install Cilium CNI (kube-proxy replacement, native routing) ------------
+# Why these settings:
+#   ipam.mode=kubernetes        — use the per-node podCIDR kubeadm allocates
+#   kubeProxyReplacement=true   — eBPF replaces kube-proxy entirely (we skipped
+#                                 kube-proxy in kubeadm init above)
+#   k8sServiceHost/Port         — bootstrap path: Cilium needs to reach the
+#                                 apiserver before its own service routing is
+#                                 active, so we point it at the VIP directly
+#   routingMode=native + autoDirectNodeRoutes=true — all 5 VMs are on one L2
+#                                 (10.0.1.0/24) so we don't need encap; Cilium
+#                                 installs kernel routes for each node's pod
+#                                 CIDR via the node's own IP. Pod packets cross
+#                                 the libvirt bridge with their real pod IP.
 
-log "Installing Calico ${CALICO_VERSION} (operator + Installation CR)"
-# --server-side: tigera's Installation CRD schema is >256 KiB, which exceeds
-# the kubectl.kubernetes.io/last-applied-configuration annotation limit and
-# fails plain `kubectl apply`. SSA stores intent in managedFields, no annotation.
-ssh_root cp-0 "kubectl --kubeconfig=/etc/kubernetes/admin.conf apply --server-side --force-conflicts -f https://raw.githubusercontent.com/projectcalico/calico/${CALICO_VERSION}/manifests/tigera-operator.yaml"
+if ! ssh_root cp-0 'command -v cilium' &>/dev/null; then
+  log "Installing cilium-cli ${CILIUM_CLI_VERSION} on cp-0"
+  ssh_root cp-0 "set -e; cd /tmp; \
+    curl -fsSL --retry 3 -o cilium-cli.tgz \
+      'https://github.com/cilium/cilium-cli/releases/download/${CILIUM_CLI_VERSION}/cilium-linux-amd64.tar.gz'; \
+    tar -xzf cilium-cli.tgz -C /usr/local/bin cilium; \
+    rm -f cilium-cli.tgz"
+fi
 
-# Wait for the Installation CRD to exist before applying the CR.
-for i in {1..30}; do
-  if ssh_root cp-0 "kubectl --kubeconfig=/etc/kubernetes/admin.conf get crd installations.operator.tigera.io" &>/dev/null; then
-    break
-  fi
-  sleep 2
-done
+if ssh_root cp-0 'KUBECONFIG=/etc/kubernetes/admin.conf cilium status --wait=false 2>/dev/null | grep -q "Cilium:.*OK"'; then
+  ok "Cilium already installed — skipping"
+else
+  log "Installing Cilium ${CILIUM_VERSION} (kube-proxy replacement, native routing)"
+  ssh_root cp-0 "KUBECONFIG=/etc/kubernetes/admin.conf cilium install \
+    --version ${CILIUM_VERSION} \
+    --set ipam.mode=kubernetes \
+    --set kubeProxyReplacement=true \
+    --set k8sServiceHost=${CONTROL_PLANE_VIP} \
+    --set k8sServicePort=6443 \
+    --set routingMode=native \
+    --set ipv4NativeRoutingCIDR=${POD_CIDR} \
+    --set autoDirectNodeRoutes=true \
+    --set ipv4.enabled=true \
+    --set ipv6.enabled=false"
+  ok "Cilium installed"
+fi
 
-cat > "${CONFIG_DIR}/calico-installation.yaml" <<EOF
-apiVersion: operator.tigera.io/v1
-kind: Installation
-metadata:
-  name: default
-spec:
-  calicoNetwork:
-    ipPools:
-    - blockSize: 26
-      cidr: ${POD_CIDR}
-      encapsulation: VXLANCrossSubnet
-      natOutgoing: Enabled
-      nodeSelector: all()
----
-apiVersion: operator.tigera.io/v1
-kind: APIServer
-metadata:
-  name: default
-spec: {}
-EOF
-scp -F "${KUBEADM_DIR}/ssh-config" -q "${CONFIG_DIR}/calico-installation.yaml" "root@cp-0:/root/calico-installation.yaml"
-ssh_root cp-0 "kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f /root/calico-installation.yaml"
-ok "Calico applied"
+log "Waiting for Cilium to report healthy"
+ssh_root cp-0 "KUBECONFIG=/etc/kubernetes/admin.conf cilium status --wait" >/dev/null
+ok "Cilium healthy"
 
 # --- Wait for nodes Ready ----------------------------------------------------
 
-log "Waiting for all 5 nodes to become Ready (Calico needs ~30s to land)"
+log "Waiting for all 5 nodes to become Ready (Cilium agents finish init ~30s)"
 for i in {1..60}; do
   ready=$(ssh_root cp-0 "kubectl --kubeconfig=/etc/kubernetes/admin.conf get nodes --no-headers 2>/dev/null | awk '\$2==\"Ready\"' | wc -l")
   if [[ "${ready}" -eq 5 ]]; then

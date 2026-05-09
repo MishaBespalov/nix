@@ -24,7 +24,11 @@ SSH_PUB_PATH="${SSH_KEY_PATH}.pub"
 K8S_VERSION="1.32"               # apt repo channel (pkgs.k8s.io/...:v1.32)
 K8S_FULL_VERSION="v1.32.0"       # kubeadm --kubernetes-version
 KUBE_VIP_VERSION="v0.8.7"
-CALICO_VERSION="v3.28.2"
+# Cilium replaces kube-proxy here (kubeadm init --skip-phases=addon/kube-proxy).
+# CILIUM_VERSION pins the Helm chart used by `cilium install`; CLI is the
+# release of the cilium command itself.
+CILIUM_VERSION="1.16.5"
+CILIUM_CLI_VERSION="v0.16.21"
 
 CONTROL_PLANE_VIP="10.0.1.10"
 CONTROL_PLANE_ENDPOINT="${CONTROL_PLANE_VIP}:6443"
