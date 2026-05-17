@@ -416,6 +416,7 @@
       clipboard-trim-trailing-spaces = true;
       gtk-wide-tabs = false;
       shell-integration = "fish";
+      shell-integration-features = "no-ssh-terminfo";
       cursor-color = "#458588";
       copy-on-select = "clipboard";
       gtk-tabs-location = "bottom";

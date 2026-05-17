@@ -23,6 +23,7 @@ in {
     (with pkgs; [
       ripgrep
       fish
+      p7zip
       go
       yazi
       gopls # LSP (optional)
@@ -170,7 +171,6 @@ in {
   home.sessionVariables = {
     K9S_FEATURE_GATE_NODE_SHELL = "true";
     EDITOR = "nvim";
-    SHELL = "fish";
     BROWSER = "zen";
     PATH = "$HOME/.local/bin:$HOME/.local/npm-global/bin:$HOME/.cargo/bin:$PATH";
     SSH_AUTH_SOCK = "$XDG_RUNTIME_DIR/ssh-agent";

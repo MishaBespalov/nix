@@ -266,7 +266,7 @@
           };
           formatters_by_ft = {
             nix = ["alejandra"]; # or: [ "nixpkgs_fmt" ]
-            go = ["gofumpt" "goimports"];
+            go = ["gofumpt"];
             yaml = ["prettier"];
             json = ["prettier"];
             c = ["clang-format"];
@@ -358,6 +358,7 @@
                 gofumpt = true; # match our formatter
                 staticcheck = true; # deeper checks
                 usePlaceholders = true; # nicer completions/signatures
+                # completeUnimported = false; # don't auto-add imports from completions
                 analyses = {
                   # useful diagnostics
                   unusedparams = true;

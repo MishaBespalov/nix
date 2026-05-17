@@ -1,15 +1,13 @@
-{
-  pkgs,
-  ...
-}: {
+{pkgs, ...}: {
   # SSH configuration
   programs.ssh = {
     enable = true;
     addKeysToAgent = "yes";
+    includes = ["~/.ssh/tw-config"];
     extraConfig = ''
       AddKeysToAgent yes
-      IdentityFile ~/.ssh/mbespalovKTS
       IdentityFile ~/.ssh/main_key
+      IdentityFile ~/.ssh/mbespalovTW
     '';
   };
 
@@ -26,9 +24,11 @@
     Service = {
       Type = "oneshot";
       RemainAfterExit = true;
+      Environment = "SSH_AUTH_SOCK=%t/ssh-agent";
       ExecStart = "${pkgs.writeShellScript "add-ssh-keys" ''
         ${pkgs.openssh}/bin/ssh-add ~/.ssh/mbespalovKTS
         ${pkgs.openssh}/bin/ssh-add ~/.ssh/main_key
+        ${pkgs.openssh}/bin/ssh-add ~/.ssh/mbespalovTW
       ''}";
     };
     Install = {

@@ -437,6 +437,44 @@ in {
     };
   };
 
+  # Keep a saddr-based bypass at the top of sing-box's prerouting chain so
+  # libvirt VM traffic (10.0.0.0/23) and in-cluster K8s traffic (pod CIDR
+  # 10.244.0.0/16, service CIDR 10.96.0.0/12) never gets TPROXY'd through
+  # throne-tun. Two problems this avoids:
+  #   1. Pod-to-pod via Service VIP: Cilium DNATs to a pod IP (10.244.x.x);
+  #      with bridge-nf-call-iptables=1 these frames hit the host's nft IP
+  #      hooks. sing-box redirects them and routes via the `direct` outbound,
+  #      which runs from the HOST — and the host has no route to 10.244/16
+  #      (only K8s nodes do), so the connection silently times out.
+  #   2. VM-to-internet: sustained flows die because throne-tun has lower
+  #      effective MTU/throughput than the underlying link.
+  # The libvirt-hook approach (/etc/libvirt/hooks/network) doesn't suffice
+  # because Throne starts in user session AFTER libvirtd brings the networks
+  # up, so the sing-box chain doesn't exist when the hook fires. This watcher
+  # polls every 5s and re-inserts the rule whenever Throne (re)creates the
+  # chain — survives reboots and Throne restarts.
+  systemd.services.sing-box-vm-bypass = {
+    description = "Re-insert sing-box bypass rule for libvirt VMs + k8s CIDRs";
+    after = ["network.target"];
+    wantedBy = ["multi-user.target"];
+    serviceConfig = {
+      Type = "simple";
+      Restart = "always";
+      RestartSec = 5;
+    };
+    script = ''
+      NFT=${pkgs.nftables}/bin/nft
+      while true; do
+        if $NFT list chain inet sing-box prerouting >/dev/null 2>&1 \
+           && ! $NFT list chain inet sing-box prerouting | grep -q '10.244.0.0/16'; then
+          $NFT insert rule inet sing-box prerouting \
+            ip saddr '{ 10.0.0.0/23, 10.244.0.0/16, 10.96.0.0/12 }' counter return
+        fi
+        sleep 5
+      done
+    '';
+  };
+
   environment.systemPackages = with pkgs; [
     vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
     wget
