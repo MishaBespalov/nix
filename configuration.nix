@@ -475,6 +475,68 @@ in {
     '';
   };
 
+  # Make corporate (OpenVPN tun0) destinations bypass Throne at the *kernel*
+  # level by populating sing-box's `inet4_local_address_set` nftables set.
+  # Without this, packets to RFC1918 corp IPs (e.g. gitlab.timeweb.net at
+  # 192.168.4.2) are marked 0x2023 by sing-box's output chain, diverted into
+  # throne-tun, and sing-box's userspace "direct" outbound tries to re-emit
+  # them from the host — which fails because the host has no route to the
+  # private corp subnet without going through tun0. The kernel bypass set
+  # is the *only* layer where exclusions reliably short-circuit before any
+  # marking happens, letting longest-prefix-match in the main routing table
+  # pick OpenVPN's pushed routes.
+  #
+  # Throne's UI "Direct" rule field only configures sing-box's `route.rules`
+  # (userspace, post-tun), NOT the TUN inbound's `inet4_route_exclude_address`
+  # (which would bake these into the set on every start). So we maintain the
+  # set ourselves with a poll loop, same pattern as sing-box-vm-bypass above.
+  #
+  # Notes on the CIDR list:
+  #   - 10.0.0.0/8 is safe to add wholesale (no overlap with auto-added entries).
+  #   - 172.16.0.0/12 is intentionally omitted: it would overlap with the
+  #     auto-added 172.17.0.0/16 (docker) and 172.19.0.0/24 (throne-tun),
+  #     and `flags interval` rejects overlapping intervals.
+  #   - 192.168.0.0/16 is similarly omitted (overlaps with the auto-added
+  #     192.168.0.0/24 LAN). We list specific corp /24s instead.
+  #   - 5.39.0.0/16 and 31.177.76.0/22 are pinned public corp ranges.
+  # `nft add element` with `|| true` makes each addition idempotent and
+  # tolerant of overlap rejections, so the loop is safe to run continuously.
+  systemd.services.throne-corp-bypass = {
+    description = "Re-add corp destination CIDRs to Throne nftables bypass set";
+    after = ["network.target"];
+    wantedBy = ["multi-user.target"];
+    serviceConfig = {
+      Type = "simple";
+      Restart = "always";
+      RestartSec = 5;
+    };
+    script = ''
+      NFT=${pkgs.nftables}/bin/nft
+      CIDRS="10.0.0.0/8 \
+             5.39.0.0/16 \
+             31.177.76.0/22 \
+             192.168.1.0/24 \
+             192.168.2.0/24 \
+             192.168.3.0/24 \
+             192.168.4.0/24 \
+             192.168.7.0/24 \
+             192.168.10.0/24 \
+             192.168.16.0/24 \
+             192.168.17.0/24 \
+             192.168.29.0/24 \
+             192.168.96.0/24 \
+             192.168.252.0/24"
+      while true; do
+        if $NFT list set inet sing-box inet4_local_address_set >/dev/null 2>&1; then
+          for cidr in $CIDRS; do
+            $NFT add element inet sing-box inet4_local_address_set "{ $cidr }" 2>/dev/null || true
+          done
+        fi
+        sleep 5
+      done
+    '';
+  };
+
   environment.systemPackages = with pkgs; [
     vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
     wget
