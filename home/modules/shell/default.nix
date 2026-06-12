@@ -14,7 +14,9 @@
   programs.bat = {
     enable = true;
     config = {
-      theme = "gruvbox-dark";
+      # No GitLab Dark tmTheme exists; "ansi" inherits the terminal's
+      # GitLab Dark palette from Ghostty
+      theme = "ansi";
       style = "numbers,changes,header";
     };
   };
@@ -403,24 +405,24 @@
 
     settings = {
       # theme = "miasma";
-      theme = "Gruvbox Dark";
+      theme = "GitLab Dark";
       font-size = 21;
       mouse-hide-while-typing = true;
       window-decoration = "auto";
       window-inherit-working-directory = true;
       app-notifications = "no-clipboard-copy";
       working-directory = "home";
-      background = "#1f1f1f";
+      background = "#28262b"; # gitlab dark background
       background-opacity = 1;
       selection-clear-on-typing = false;
       clipboard-trim-trailing-spaces = true;
       gtk-wide-tabs = false;
       shell-integration = "fish";
       shell-integration-features = "no-ssh-terminfo";
-      cursor-color = "#458588";
+      cursor-color = "#ffffff"; # gitlab dark cursor
       copy-on-select = "clipboard";
       gtk-tabs-location = "bottom";
-      gtk-custom-css = "/home/misha/nixos-dotfiles/home/modules/shell/ghostty-gruvbox-tabs.css";
+      gtk-custom-css = "/home/misha/nixos-dotfiles/home/modules/shell/ghostty-gitlab-tabs.css";
 
       custom-shader = [
         "shaders/sonic_boom_cursor.glsl"

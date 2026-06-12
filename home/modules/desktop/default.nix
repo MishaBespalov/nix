@@ -27,14 +27,14 @@
     };
   };
 
-  # Minimal mako: simple toast notifications with gruvbox theme
+  # Minimal mako: simple toast notifications with gitlab dark theme
   services.mako = {
     enable = true;
     settings = {
       anchor = "top-right";
-      background-color = "#282828";
-      text-color = "#ebdbb2";
-      border-color = "#665c54";
+      background-color = "#28262b";
+      text-color = "#ececef";
+      border-color = "#535158";
       border-radius = 8;
       border-size = 1;
       default-timeout = 5000;
@@ -119,10 +119,10 @@
             week-start = 1;
             on-scroll = 1;
             format = {
-              months = "<span color='#fabd2f'><b>{}</b></span>";
-              days = "<span color='#ebdbb2'><b>{}</b></span>";
-              weekdays = "<span color='#d79921'><b>{}</b></span>";
-              today = "<span color='#fb4934'><b><u>{}</u></b></span>";
+              months = "<span color='#e9be74'><b>{}</b></span>";
+              days = "<span color='#ececef'><b>{}</b></span>";
+              weekdays = "<span color='#d99530'><b>{}</b></span>";
+              today = "<span color='#f57f6c'><b><u>{}</u></b></span>";
             };
           };
           actions = {
@@ -137,7 +137,7 @@
     };
 
     style = ''
-      /* Gruvbox Dark theme for Waybar */
+      /* GitLab Dark theme for Waybar */
       * {
         border: none;
         border-radius: 0;
@@ -149,31 +149,31 @@
       window#waybar {
         background-color: transparent;
         border-radius: 12px;
-        color: #ebdbb2;
+        color: #ececef;
       }
 
       #clock {
-        background-color: #282828;
-        color: #ebdbb2;
+        background-color: #28262b;
+        color: #ececef;
         padding: 6px 16px;
         border-radius: 10px;
-        border: 1px solid #504945;
+        border: 1px solid #434248;
         font-weight: bold;
         font-size: 14px;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
       }
 
       #clock:hover {
-        background-color: #3c3836;
-        border-color: #7c6f64;
+        background-color: #333238;
+        border-color: #737278;
       }
 
       #tray {
-        background-color: #282828;
-        color: #ebdbb2;
+        background-color: #28262b;
+        color: #ececef;
         padding: 6px 16px;
         border-radius: 10px;
-        border: 1px solid #504945;
+        border: 1px solid #434248;
         margin-left: 8px;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
       }
@@ -184,18 +184,18 @@
 
       #tray > .needs-attention {
         -gtk-icon-effect: highlight;
-        background-color: #cc241d;
+        background-color: #f57f6c;
       }
 
       tooltip {
-        background-color: #282828;
-        border: 1px solid #504945;
+        background-color: #28262b;
+        border: 1px solid #434248;
         border-radius: 8px;
-        color: #ebdbb2;
+        color: #ececef;
       }
 
       tooltip label {
-        color: #ebdbb2;
+        color: #ececef;
       }
     '';
   };
@@ -212,17 +212,17 @@
       lines = 10;
     };
 
-    # Gruvbox theme (warm dark colors)
+    # GitLab Dark theme (cool dark grays with orange accent)
     style = ''
-      /* ----- Gruvbox palette ----- */
-      /* https://github.com/morhetz/gruvbox */
-      @define-color bg        #1d2021;  /* hard dark background */
-      @define-color bg-alt    #282828;  /* normal dark background */
-      @define-color surface   #3c3836;  /* dark gray */
-      @define-color text      #ebdbb2;  /* light foreground */
-      @define-color subtext   #d5c4a1;  /* light4 */
-      @define-color accent    #fabd2f;  /* bright yellow */
-      @define-color accent2   #83a598;  /* bright blue */
+      /* ----- GitLab Dark palette ----- */
+      /* https://gitlab.com - dark mode UI colors */
+      @define-color bg        #1f1e24;  /* darkest background */
+      @define-color bg-alt    #28262b;  /* normal dark background */
+      @define-color surface   #333238;  /* gray-900 */
+      @define-color text      #ececef;  /* text */
+      @define-color subtext   #bfbfc3;  /* gray-200 */
+      @define-color accent    #d99530;  /* orange */
+      @define-color accent2   #7fb6ed;  /* blue */
 
       /* ----- base widgets ----- */
       * { font-family: JetBrainsMono Nerd Font, monospace; font-size: 14px; }
@@ -299,11 +299,11 @@
           dots_spacing = 0.35;
           dots_center = true;
           outer_color = "rgba(0, 0, 0, 0)";
-          inner_color = "rgba(40, 40, 40, 0.8)"; # gruvbox dark background with transparency
-          font_color = "rgb(235, 219, 178)"; # gruvbox light foreground
+          inner_color = "rgba(40, 38, 43, 0.8)"; # gitlab dark background with transparency
+          font_color = "rgb(236, 236, 239)"; # gitlab text foreground
           fade_on_empty = false;
           rounding = -1;
-          check_color = "rgb(250, 189, 47)"; # gruvbox bright yellow
+          check_color = "rgb(217, 149, 48)"; # gitlab orange
           placeholder_text = "Input Password...";
           hide_input = false;
           position = "0, -200";
@@ -316,7 +316,7 @@
         {
           monitor = "";
           text = "cmd[update:1000] echo \"$(date +\"%A, %B %d\")\"";
-          color = "rgba(235, 219, 178, 0.75)"; # gruvbox light foreground with transparency
+          color = "rgba(236, 236, 239, 0.75)"; # gitlab text foreground with transparency
           font_size = 22;
           font_family = "JetBrains Mono";
           position = "0, 300";
@@ -326,7 +326,7 @@
         {
           monitor = "";
           text = "cmd[update:1000] echo \"$(date +\"%-I:%M\")\"";
-          color = "rgba(235, 219, 178, 0.75)"; # gruvbox light foreground with transparency
+          color = "rgba(236, 236, 239, 0.75)"; # gitlab text foreground with transparency
           font_size = 95;
           font_family = "JetBrains Mono Nerd Font";
           position = "0, 200";

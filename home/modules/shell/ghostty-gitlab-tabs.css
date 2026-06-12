@@ -1,12 +1,12 @@
-/* Gruvbox Dark Theme for Ghostty Tab Bar */
+/* GitLab Dark Theme for Ghostty Tab Bar */
 
 tabbar {
-  background-color: #1f1f1f;
+  background-color: #1f1e24;
   border: none;
 }
 
 tabbar tabbox {
-  background-color: #1f1f1f;
+  background-color: #1f1e24;
   font-family: "JetBrains Mono", "Fira Code", monospace;
   font-size: 13px;
   border: none;
@@ -14,8 +14,8 @@ tabbar tabbox {
 
 /* Inactive tabs */
 tabbar tabbox tab {
-  background-color: #3c3836;
-  color: #a89984;
+  background-color: #333238;
+  color: #89888d;
   border: none;
   border-radius: 6px 6px 0 0;
   margin: 4px 2px 0 2px;
@@ -24,20 +24,20 @@ tabbar tabbox tab {
 
 /* Tab hover */
 tabbar tabbox tab:hover:not(:selected) {
-  background-color: #504945;
-  color: #ebdbb2;
+  background-color: #434248;
+  color: #ececef;
 }
 
 /* Active tab */
 tabbar tabbox tab:selected {
-  background-color: #928374;
-  color: #1f1f1f;
+  background-color: #ad95e9;
+  color: #1f1e24;
   font-weight: 600;
 }
 
 tabbar tabbox tab:selected label {
   font-weight: 600;
-  color: #1f1f1f;
+  color: #1f1e24;
 }
 
 
@@ -51,7 +51,7 @@ tabbar tabbox tab label {
 tabbar tabbox tab button {
   background: transparent;
   border: none;
-  color: #665c54;
+  color: #535158;
   border-radius: 4px;
   opacity: 0;
   min-width: 0;
@@ -63,15 +63,15 @@ tabbar tabbox tab:hover button {
 }
 
 tabbar tabbox tab button:hover {
-  background-color: #cc241d;
-  color: #ebdbb2;
+  background-color: #f57f6c;
+  color: #1f1e24;
   opacity: 1;
 }
 
 /* New tab button */
 tabbar button {
   background-color: transparent;
-  color: #a89984;
+  color: #89888d;
   border: none;
   border-radius: 4px;
   min-width: 0;
@@ -79,6 +79,6 @@ tabbar button {
 }
 
 tabbar button:hover {
-  background-color: #504945;
-  color: #ebdbb2;
+  background-color: #434248;
+  color: #ececef;
 }

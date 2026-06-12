@@ -5,11 +5,11 @@
   programs.k9s = {
     enable = true;
 
-    # Set default skin and custom gruvbox dark theme
+    # Set default skin and custom gitlab dark theme
     settings = {
       k9s = {
         ui = {
-          skin = "gruvbox_dark";
+          skin = "gitlab_dark";
         };
         shellPod = {
           image = "busybox:1.35.0";
@@ -23,104 +23,104 @@
     };
 
     skins = {
-      gruvbox_dark = {
+      gitlab_dark = {
         k9s = {
           body = {
-            fgColor = "#d5c4a1"; # softer gruvbox light4 instead of bright fg1
-            bgColor = "#282828"; # softer gruvbox bg0 instead of hard bg0
-            logoColor = "#d79921"; # muted yellow instead of bright yellow
+            fgColor = "#ececef"; # gitlab text
+            bgColor = "#28262b"; # gitlab dark background
+            logoColor = "#d99530"; # gitlab orange
           };
           prompt = {
-            fgColor = "#ebdbb2"; # softer fg1 instead of brightest fg0
-            bgColor = "#3c3836"; # keep bg1 for subtle contrast
-            suggestColor = "#7c6f64"; # muted bg4 instead of bright blue
+            fgColor = "#ececef"; # gitlab text
+            bgColor = "#333238"; # gitlab gray-900 for subtle contrast
+            suggestColor = "#737278"; # gitlab gray-500
           };
           info = {
-            fgColor = "#bdae93"; # softer fg3 instead of purple
-            sectionColor = "#d5c4a1"; # softer light4 instead of bright fg0
+            fgColor = "#a4a3a8"; # gitlab gray-300
+            sectionColor = "#bfbfc3"; # gitlab gray-200
           };
           dialog = {
-            fgColor = "#d5c4a1"; # softer light4 instead of bright fg0
-            bgColor = "#3c3836"; # keep bg1
-            buttonFgColor = "#504945"; # softer bg2 instead of harsh dark
-            buttonBgColor = "#7c6f64"; # muted bg4 instead of bright blue
-            buttonFocusFgColor = "#282828"; # softer bg0 instead of harsh dark
-            buttonFocusBgColor = "#d79921"; # muted yellow instead of bright
-            labelFgColor = "#cc241d"; # softer red instead of bright red
-            fieldFgColor = "#d5c4a1"; # softer light4
+            fgColor = "#bfbfc3"; # gitlab gray-200
+            bgColor = "#333238"; # gitlab gray-900
+            buttonFgColor = "#28262b"; # gitlab dark background
+            buttonBgColor = "#737278"; # gitlab gray-500
+            buttonFocusFgColor = "#28262b"; # gitlab dark background
+            buttonFocusBgColor = "#d99530"; # gitlab orange
+            labelFgColor = "#f57f6c"; # gitlab red
+            fieldFgColor = "#bfbfc3"; # gitlab gray-200
           };
           frame = {
             border = {
-              fgColor = "#504945"; # softer bg2 instead of bg3
-              focusColor = "#d79921"; # muted yellow instead of bright
+              fgColor = "#434248"; # gitlab gray-800
+              focusColor = "#d99530"; # gitlab orange
             };
             menu = {
-              fgColor = "#d5c4a1"; # softer light4
-              keyColor = "#bdae93"; # muted fg3 instead of purple
-              numKeyColor = "#bdae93"; # muted fg3
+              fgColor = "#bfbfc3"; # gitlab gray-200
+              keyColor = "#a4a3a8"; # gitlab gray-300
+              numKeyColor = "#a4a3a8"; # gitlab gray-300
             };
             crumbs = {
-              fgColor = "#3c3836"; # softer bg1 instead of harsh dark
-              bgColor = "#7c6f64"; # muted bg4 instead of bright blue
-              activeColor = "#d79921"; # muted yellow
+              fgColor = "#333238"; # gitlab gray-900
+              bgColor = "#737278"; # gitlab gray-500
+              activeColor = "#d99530"; # gitlab orange
             };
             status = {
-              newColor = "#98971a"; # softer green instead of bright
-              modifyColor = "#7c6f64"; # muted bg4 instead of bright blue
-              addColor = "#689d6a"; # softer aqua instead of bright
-              errorColor = "#cc241d"; # softer red instead of bright
-              highlightColor = "#d65d0e"; # softer orange instead of bright
-              killColor = "#cc241d"; # softer red
-              completedColor = "#928374"; # keep muted gray
+              newColor = "#52b87a"; # gitlab green
+              modifyColor = "#737278"; # gitlab gray-500
+              addColor = "#32c5d2"; # gitlab cyan
+              errorColor = "#f57f6c"; # gitlab red
+              highlightColor = "#e9be74"; # gitlab bright yellow
+              killColor = "#f57f6c"; # gitlab red
+              completedColor = "#89888d"; # gitlab gray-400
             };
             title = {
-              fgColor = "#ebdbb2"; # softer fg1 instead of bright fg0
-              bgColor = "#3c3836"; # softer bg1 instead of bg0
-              highlightColor = "#d79921"; # muted yellow
-              counterColor = "#bdae93"; # muted fg3 instead of purple
-              filterColor = "#d79921"; # muted yellow
+              fgColor = "#ececef"; # gitlab text
+              bgColor = "#333238"; # gitlab gray-900
+              highlightColor = "#d99530"; # gitlab orange
+              counterColor = "#a4a3a8"; # gitlab gray-300
+              filterColor = "#d99530"; # gitlab orange
             };
           };
           views = {
             charts = {
-              bgColor = "#282828"; # softer bg0 instead of hard
-              dialBgColor = "#3c3836"; # keep bg1
-              chartBgColor = "#504945"; # softer bg2 for subtle contrast
-              defaultDialColors = ["#cc241d" "#98971a" "#d79921" "#458588" "#b16286" "#689d6a"]; # muted palette
-              defaultChartColors = ["#cc241d" "#98971a" "#d79921" "#458588" "#b16286" "#689d6a"]; # muted palette
+              bgColor = "#28262b"; # gitlab dark background
+              dialBgColor = "#333238"; # gitlab gray-900
+              chartBgColor = "#434248"; # gitlab gray-800
+              defaultDialColors = ["#f57f6c" "#52b87a" "#d99530" "#7fb6ed" "#ad95e9" "#32c5d2"]; # gitlab palette
+              defaultChartColors = ["#f57f6c" "#52b87a" "#d99530" "#7fb6ed" "#ad95e9" "#32c5d2"]; # gitlab palette
             };
             table = {
-              fgColor = "#d5c4a1"; # softer light4
-              bgColor = "#282828"; # softer bg0 instead of hard
-              cursorFgColor = "#3c3836"; # softer bg1 instead of harsh dark
-              cursorBgColor = "#d79921"; # muted yellow
-              markColor = "#bdae93"; # muted fg3 instead of purple
+              fgColor = "#bfbfc3"; # gitlab gray-200
+              bgColor = "#28262b"; # gitlab dark background
+              cursorFgColor = "#28262b"; # gitlab dark background
+              cursorBgColor = "#d99530"; # gitlab orange
+              markColor = "#a4a3a8"; # gitlab gray-300
               header = {
-                fgColor = "#ebdbb2"; # softer fg1
-                bgColor = "#504945"; # softer bg2 for subtle contrast
-                sorterColor = "#7c6f64"; # muted bg4 instead of bright blue
+                fgColor = "#ececef"; # gitlab text
+                bgColor = "#434248"; # gitlab gray-800 for subtle contrast
+                sorterColor = "#7fb6ed"; # gitlab blue
               };
             };
             xray = {
-              fgColor = "#d5c4a1"; # softer light4
-              bgColor = "#282828"; # softer bg0
-              cursorColor = "#d79921"; # muted yellow
-              graphicColor = "#7c6f64"; # muted bg4 instead of bright blue
+              fgColor = "#bfbfc3"; # gitlab gray-200
+              bgColor = "#28262b"; # gitlab dark background
+              cursorColor = "#d99530"; # gitlab orange
+              graphicColor = "#737278"; # gitlab gray-500
               showIcons = false;
             };
             yaml = {
-              keyColor = "#7c6f64"; # muted bg4 instead of bright blue
-              colonColor = "#928374"; # keep muted gray
-              valueColor = "#d5c4a1"; # softer light4
+              keyColor = "#7fb6ed"; # gitlab blue
+              colonColor = "#89888d"; # gitlab gray-400
+              valueColor = "#bfbfc3"; # gitlab gray-200
             };
             logs = {
-              fgColor = "#d5c4a1"; # softer light4
-              bgColor = "#282828"; # softer bg0
+              fgColor = "#bfbfc3"; # gitlab gray-200
+              bgColor = "#28262b"; # gitlab dark background
               indicator = {
-                fgColor = "#bdae93"; # muted fg3 instead of purple
-                bgColor = "#3c3836"; # keep bg1
-                toggleOnColor = "#98971a"; # softer green
-                toggleOffColor = "#cc241d"; # softer red
+                fgColor = "#a4a3a8"; # gitlab gray-300
+                bgColor = "#333238"; # gitlab gray-900
+                toggleOnColor = "#52b87a"; # gitlab green
+                toggleOffColor = "#f57f6c"; # gitlab red
               };
             };
           };
