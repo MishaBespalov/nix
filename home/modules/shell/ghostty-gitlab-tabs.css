@@ -30,7 +30,7 @@ tabbar tabbox tab:hover:not(:selected) {
 
 /* Active tab */
 tabbar tabbox tab:selected {
-  background-color: #ad95e9;
+  background-color: #52b87a;
   color: #1f1e24;
   font-weight: 600;
 }
