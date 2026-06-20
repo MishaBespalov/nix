@@ -27,6 +27,10 @@ zen-browser = {
       url = "github:xremap/nix-flake";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # Note: hunk pins its own (newer) nixpkgs for its build tooling (bun2nix
+    # needs zig_0_15, absent from 25.05), so don't make it follow ours.
+    hunk.url = "github:modem-dev/hunk";
   };
 
   outputs = {

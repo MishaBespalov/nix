@@ -32,6 +32,7 @@ in {
       golangci-lint # meta-linter (optional)
       zoom
       bacon
+      pandoc
       nil
       chromium
       anki
