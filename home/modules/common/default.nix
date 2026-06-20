@@ -167,15 +167,13 @@ in {
       inputs.nixpkgs-unstable.legacyPackages.${pkgs.system}.sing-box
       # Zen Browser from flake
       zen-browser-wrapped
-      # Vivaldi (Chromium-based) + proprietary media codecs
-      pkgs.vivaldi
-      pkgs.vivaldi-ffmpeg-codecs
+      # Vivaldi lives in its own module: ./home/modules/vivaldi
     ];
 
   home.sessionVariables = {
     K9S_FEATURE_GATE_NODE_SHELL = "true";
     EDITOR = "nvim";
-    BROWSER = "zen";
+    BROWSER = "vivaldi";
     PATH = "$HOME/.local/bin:$HOME/.local/npm-global/bin:$HOME/.cargo/bin:$PATH";
     SSH_AUTH_SOCK = "$XDG_RUNTIME_DIR/ssh-agent";
   };

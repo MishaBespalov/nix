@@ -13,6 +13,7 @@
     ./home/modules/nixvim
     ./home/modules/shell
     ./home/modules/ssh
+    ./home/modules/vivaldi
     ./home/modules/yazi
   ];
 

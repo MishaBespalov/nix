@@ -21,18 +21,18 @@
             desc = "Open";
           }
         ];
-        zen = [
+        vivaldi = [
           {
-            run = "zen \"$@\"";
+            run = "vivaldi \"$@\"";
             orphan = true;
-            desc = "Open in Zen Browser";
+            desc = "Open in Vivaldi";
           }
         ];
         pdf = [
           {
-            run = "zen \"$@\"";
+            run = "vivaldi \"$@\"";
             orphan = true;
-            desc = "Open with Zen Browser";
+            desc = "Open with Vivaldi";
           }
         ];
       };
@@ -57,15 +57,15 @@
 
           {
             mime = "text/html";
-            use = "zen";
+            use = "vivaldi";
           }
           {
             name = "*.html";
-            use = "zen";
+            use = "vivaldi";
           }
           {
             name = "*.htm";
-            use = "zen";
+            use = "vivaldi";
           }
 
           {

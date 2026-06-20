@@ -288,7 +288,7 @@ in {
     MOZ_ENABLE_WAYLAND = "1";
     QT_QPA_PLATFORM = "wayland";
     SDL_VIDEODRIVER = "wayland";
-    BROWSER = "zen";
+    BROWSER = "vivaldi";
     MOZ_AUDIO_BACKEND = "pulse";
   };
 

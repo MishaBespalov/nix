@@ -346,16 +346,16 @@
     mimeType = ["text/html" "x-scheme-handler/http" "x-scheme-handler/https"];
   };
 
-  # Set Zen Browser as default browser and VLC as default video player
+  # Set Vivaldi as default browser and VLC as default video player
   xdg.mimeApps = {
     enable = true;
     defaultApplications = {
-      "text/html" = "zen.desktop";
-      "x-scheme-handler/http" = "zen.desktop";
-      "x-scheme-handler/https" = "zen.desktop";
-      "x-scheme-handler/about" = "zen.desktop";
-      "x-scheme-handler/unknown" = "zen.desktop";
-      "application/pdf" = "zen.desktop";
+      "text/html" = "vivaldi-stable.desktop";
+      "x-scheme-handler/http" = "vivaldi-stable.desktop";
+      "x-scheme-handler/https" = "vivaldi-stable.desktop";
+      "x-scheme-handler/about" = "vivaldi-stable.desktop";
+      "x-scheme-handler/unknown" = "vivaldi-stable.desktop";
+      "application/pdf" = "vivaldi-stable.desktop";
 
       # Video files - VLC as default
       "video/mp4" = "vlc.desktop";

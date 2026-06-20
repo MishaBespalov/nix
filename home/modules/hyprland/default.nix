@@ -35,7 +35,7 @@
     settings = {
       "$mainMod" = "SUPER";
       "$terminal" = "ghostty";
-      "$browser" = "zen";
+      "$browser" = "vivaldi";
       "$telegram" = "telegram-desktop";
       "$menu" = "wofi --show drun";
       monitor = [
@@ -123,7 +123,7 @@
         "[workspace 1 silent] throne"
         # "[workspace 2 silent] spotify"
         "[workspace 2 silent] telegram-desktop"
-        "[workspace 3 silent] zen"
+        "[workspace 3 silent] vivaldi"
         "[workspace 4 silent] ghostty"
       ];
 
