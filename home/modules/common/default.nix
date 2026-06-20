@@ -5,17 +5,17 @@
 }: let
   zen-browser-wrapped = pkgs.symlinkJoin {
     name = "zen-browser-wrapped";
-    paths = [inputs.zen-browser.packages.${pkgs.system}.twilight];
+    paths = [inputs.zen-browser.packages.${pkgs.system}.beta];
     buildInputs = [pkgs.makeWrapper];
     postBuild = ''
-      wrapProgram $out/bin/zen-twilight \
+      wrapProgram $out/bin/zen-beta \
         --prefix LD_LIBRARY_PATH : "${pkgs.lib.makeLibraryPath [
         pkgs.pipewire
         pkgs.pulseaudio
         pkgs.alsa-lib
         pkgs.ffmpeg
       ]}"
-      ln -s $out/bin/zen-twilight $out/bin/zen
+      ln -s $out/bin/zen-beta $out/bin/zen
     '';
   };
 in {
@@ -167,6 +167,9 @@ in {
       inputs.nixpkgs-unstable.legacyPackages.${pkgs.system}.sing-box
       # Zen Browser from flake
       zen-browser-wrapped
+      # Vivaldi (Chromium-based) + proprietary media codecs
+      pkgs.vivaldi
+      pkgs.vivaldi-ffmpeg-codecs
     ];
 
   home.sessionVariables = {
