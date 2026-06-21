@@ -173,7 +173,7 @@ in {
   home.sessionVariables = {
     K9S_FEATURE_GATE_NODE_SHELL = "true";
     EDITOR = "nvim";
-    BROWSER = "vivaldi";
+    BROWSER = "zen";
     PATH = "$HOME/.local/bin:$HOME/.local/npm-global/bin:$HOME/.cargo/bin:$PATH";
     SSH_AUTH_SOCK = "$XDG_RUNTIME_DIR/ssh-agent";
   };
