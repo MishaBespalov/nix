@@ -117,13 +117,23 @@ in {
       display: none !important;
     }
 
-    /* GitLab Dark: keep the green accent only on the active tab; make the
-       toolbar/header dark (#1f1e24) instead of the accent green. */
+    /* GitLab Dark: keep the accent only on the active tab; make the
+       toolbar/header dark (#1f1e24) instead of the accent color. */
     #browser #header,
     #browser .toolbar-mainbar,
     #browser #footer {
       background-color: #1f1e24 !important;
       background-image: none !important;
+    }
+
+    /* Relight toolbar button icons (reload/back/forward) — Vivaldi auto-darkens
+       them to contrast the light accent, which is invisible on the dark toolbar.
+       Scoped to .toolbar-mainbar so the active tab's accent text stays dark. */
+    #browser .toolbar-mainbar .button-toolbar > button,
+    #browser .toolbar-mainbar .button-toolbar > button .button-icon,
+    #browser .toolbar-mainbar .button-toolbar > button svg {
+      color: #ececef !important;
+      fill: #ececef !important;
     }
 
     /* Optional: darker left tab bar (uncomment to enable)

@@ -310,6 +310,10 @@ in {
     ];
   };
 
+  # Needed so the home-manager color-scheme/GTK dconf settings actually apply
+  # (and are readable by the gtk portal -> Chromium/Vivaldi dark native menus).
+  programs.dconf.enable = true;
+
   hardware.graphics.enable = true;
 
   # Enable WiFi support

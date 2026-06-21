@@ -67,6 +67,21 @@
     size = 16;
   };
 
+  # Dark GTK theme + dark color-scheme preference.
+  # color-scheme = prefer-dark is what the gtk portal reports to Chromium/Vivaldi,
+  # turning the white page right-click (context) menu dark.
+  gtk = {
+    enable = true;
+    theme = {
+      name = "Adwaita-dark";
+      package = pkgs.gnome-themes-extra;
+    };
+    gtk3.extraConfig.gtk-application-prefer-dark-theme = 1;
+    gtk4.extraConfig.gtk-application-prefer-dark-theme = 1;
+  };
+
+  dconf.settings."org/gnome/desktop/interface".color-scheme = "prefer-dark";
+
   services.hyprpaper = {
     enable = true;
 
