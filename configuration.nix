@@ -653,6 +653,59 @@ in {
     '';
   };
 
+  # Pin harbor-cloud.timeweb.net to the physical LAN gateway so it ALWAYS goes
+  # out direct, bypassing every VPN — current (OpenVPN tun0, Throne/sing-box)
+  # and any future one. Two layers, because different VPNs hijack at different
+  # points:
+  #   1. Policy routing (kernel): a dedicated table (137) holds a direct route
+  #      to each resolved harbor IP via the real uplink gateway, and an `ip rule`
+  #      at priority 50 sends harbor traffic to that table. ip-rule lookup runs
+  #      before the main table, so this beats OpenVPN's pushed `185.0.0.0/8 via
+  #      tun0` (main-table route) AND any future WireGuard/sing-box rule (those
+  #      sit at priority ~9000-32764, all higher numbers than 50 → we win).
+  #   2. nftables bypass set: if Throne/sing-box is up, add the harbor IPs to its
+  #      `inet4_local_address_set` so packets are never marked/diverted into
+  #      throne-tun in the first place (same mechanism as throne-corp-bypass).
+  # The gateway + uplink device are discovered from NetworkManager (not from the
+  # `default` route, which a full-tunnel VPN may have replaced), and the host is
+  # re-resolved every loop so a DNS/IP change is picked up automatically. The
+  # poll loop also re-asserts the rule if a VPN flushes it on connect.
+  systemd.services.harbor-direct = {
+    description = "Pin harbor-cloud.timeweb.net traffic to the physical gateway (bypass all VPNs)";
+    after = ["network.target" "NetworkManager.service"];
+    wantedBy = ["multi-user.target"];
+    path = [pkgs.iproute2 pkgs.networkmanager pkgs.gawk pkgs.nftables pkgs.getent pkgs.gnugrep];
+    serviceConfig = {
+      Type = "simple";
+      Restart = "always";
+      RestartSec = 5;
+    };
+    script = ''
+      HOST=harbor-cloud.timeweb.net
+      TABLE=137
+      PRIO=50
+      while true; do
+        # Physical uplink (ethernet/wifi) and its gateway, independent of any VPN.
+        DEV=$(nmcli -t -f DEVICE,TYPE,STATE device \
+              | awk -F: '($2=="ethernet"||$2=="wifi") && $3=="connected"{print $1; exit}')
+        GW=""
+        [ -n "$DEV" ] && GW=$(nmcli -g IP4.GATEWAY device show "$DEV")
+        if [ -n "$DEV" ] && [ -n "$GW" ]; then
+          for ip in $(getent ahostsv4 "$HOST" | awk '{print $1}' | sort -u); do
+            ip route replace "$ip" via "$GW" dev "$DEV" table "$TABLE"
+            if ! ip rule list | grep -q "to $ip lookup $TABLE"; then
+              ip rule add to "$ip" lookup "$TABLE" priority "$PRIO"
+              ip route flush cache
+            fi
+            # If Throne/sing-box is active, exclude harbor from its TUN too.
+            nft add element inet sing-box inet4_local_address_set "{ $ip }" 2>/dev/null || true
+          done
+        fi
+        sleep 15
+      done
+    '';
+  };
+
   environment.systemPackages = with pkgs; [
     vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
     wget
