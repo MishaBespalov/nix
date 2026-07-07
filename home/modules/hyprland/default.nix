@@ -105,6 +105,8 @@
       misc = {
         focus_on_activate = true;
         vfr = true;
+        vrr = 2; # FreeSync only while a fullscreen app (game) is focused
+
         disable_hyprland_logo = true;
         disable_splash_rendering = true;
       };
@@ -114,6 +116,15 @@
         hide_on_key_press = true;
         hide_on_touch = true;
       };
+
+      # Steam games run as floating XWayland windows sized over the screen;
+      # without real fullscreen they lose keyboard focus while the game keeps
+      # the pointer grab (mouse works, keys dead). Force proper fullscreen
+      # and allow tearing for lower latency.
+      windowrulev2 = [
+        "fullscreen, class:^(steam_app_\\d+)$"
+        "immediate, class:^(steam_app_\\d+)$"
+      ];
 
       # Auto-start applications in specific workspaces
       exec-once = [

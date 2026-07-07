@@ -314,7 +314,17 @@ in {
   # (and are readable by the gtk portal -> Chromium/Vivaldi dark native menus).
   programs.dconf.enable = true;
 
-  hardware.graphics.enable = true;
+  hardware.graphics = {
+    enable = true;
+    enable32Bit = true; # 32-bit Vulkan/GL, required by Steam and Proton games
+  };
+
+  # Gaming (Overwatch 2 via Steam + Proton)
+  programs.steam = {
+    enable = true;
+    remotePlay.openFirewall = true;
+  };
+  programs.gamemode.enable = true;
 
   # Enable WiFi support
   hardware.wirelessRegulatoryDatabase = true;
@@ -325,6 +335,10 @@ in {
   # Vial keyboard configurator - allow access to hidraw devices
   services.udev.extraRules = ''
     KERNEL=="hidraw*", SUBSYSTEM=="hidraw", MODE="0660", GROUP="users", TAG+="uaccess", TAG+="udev-acl"
+
+    # Ergohaven Phenom Micro exposes a HID interface udev mislabels as a joystick,
+    # which makes Steam Input adopt the keyboard as a gamepad and swallow key input
+    ENV{ID_VENDOR_ID}=="e126", ENV{ID_MODEL_ID}=="0054", ENV{ID_INPUT_JOYSTICK}=="1", ENV{ID_INPUT_JOYSTICK}="", ENV{ID_INPUT_KEYBOARD}="1"
   '';
 
   # For the GUI client
