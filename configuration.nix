@@ -563,25 +563,33 @@ in {
     '';
   };
 
-  # Pin harbor-cloud.timeweb.net to the physical LAN gateway so it ALWAYS goes
-  # out direct, bypassing every VPN — current (OpenVPN tun0, Throne/sing-box)
+  # Pin selected hosts/subnets to the physical LAN gateway so they ALWAYS go
+  # out direct, bypassing every VPN — current (OpenVPN tun0, Happ/sing-box)
   # and any future one. Two layers, because different VPNs hijack at different
   # points:
   #   1. Policy routing (kernel): a dedicated table (137) holds a direct route
-  #      to each resolved harbor IP via the real uplink gateway, and an `ip rule`
-  #      at priority 50 sends harbor traffic to that table. ip-rule lookup runs
+  #      to each destination via the real uplink gateway, and an `ip rule`
+  #      at priority 50 sends that traffic to the table. ip-rule lookup runs
   #      before the main table, so this beats OpenVPN's pushed `185.0.0.0/8 via
-  #      tun0` (main-table route) AND any future WireGuard/sing-box rule (those
+  #      tun0` (main-table route) AND any WireGuard/sing-box rule (those
   #      sit at priority ~9000-32764, all higher numbers than 50 → we win).
-  #   2. nftables bypass set: if Throne/sing-box is up, add the harbor IPs to its
+  #   2. nftables bypass set: if Throne/sing-box is up, add the IPs to its
   #      `inet4_local_address_set` so packets are never marked/diverted into
-  #      throne-tun in the first place (same mechanism as throne-corp-bypass).
+  #      the TUN in the first place (no-op under Happ, which has no nft table;
+  #      layer 1 alone covers it).
   # The gateway + uplink device are discovered from NetworkManager (not from the
-  # `default` route, which a full-tunnel VPN may have replaced), and the host is
+  # `default` route, which a full-tunnel VPN may have replaced), and hosts are
   # re-resolved every loop so a DNS/IP change is picked up automatically. The
   # poll loop also re-asserts the rule if a VPN flushes it on connect.
-  systemd.services.harbor-direct = {
-    description = "Pin harbor-cloud.timeweb.net traffic to the physical gateway (bypass all VPNs)";
+  #
+  # Bypassed destinations:
+  #   - harbor-cloud.timeweb.net: corp registry
+  #   - bnxp*.vivox.com: Blizzard voice chat (Vivox) login — fails with
+  #     error 5003 when routed through the proxy
+  #   - 85.236.96.0/21: Vivox media servers (RTP endpoints are negotiated
+  #     in-protocol, not via DNS, so the whole block goes direct)
+  systemd.services.vpn-bypass-direct = {
+    description = "Pin selected traffic to the physical gateway (bypass all VPNs)";
     after = ["network.target" "NetworkManager.service"];
     wantedBy = ["multi-user.target"];
     path = [pkgs.iproute2 pkgs.networkmanager pkgs.gawk pkgs.nftables pkgs.getent pkgs.gnugrep];
@@ -591,7 +599,8 @@ in {
       RestartSec = 5;
     };
     script = ''
-      HOST=harbor-cloud.timeweb.net
+      HOSTS="harbor-cloud.timeweb.net bnxp.vivox.com bnxp.www.vivox.com"
+      SUBNETS="85.236.96.0/21"
       TABLE=137
       PRIO=50
       while true; do
@@ -601,14 +610,18 @@ in {
         GW=""
         [ -n "$DEV" ] && GW=$(nmcli -g IP4.GATEWAY device show "$DEV")
         if [ -n "$DEV" ] && [ -n "$GW" ]; then
-          for ip in $(getent ahostsv4 "$HOST" | awk '{print $1}' | sort -u); do
-            ip route replace "$ip" via "$GW" dev "$DEV" table "$TABLE"
-            if ! ip rule list | grep -q "to $ip lookup $TABLE"; then
-              ip rule add to "$ip" lookup "$TABLE" priority "$PRIO"
+          DESTS="$SUBNETS"
+          for host in $HOSTS; do
+            DESTS="$DESTS $(getent ahostsv4 "$host" | awk '{print $1}' | sort -u | tr '\n' ' ')"
+          done
+          for dest in $DESTS; do
+            ip route replace "$dest" via "$GW" dev "$DEV" table "$TABLE"
+            if ! ip rule list | grep -q "to $dest lookup $TABLE"; then
+              ip rule add to "$dest" lookup "$TABLE" priority "$PRIO"
               ip route flush cache
             fi
-            # If Throne/sing-box is active, exclude harbor from its TUN too.
-            nft add element inet sing-box inet4_local_address_set "{ $ip }" 2>/dev/null || true
+            # If Throne/sing-box is active, exclude from its TUN too.
+            nft add element inet sing-box inet4_local_address_set "{ $dest }" 2>/dev/null || true
           done
         fi
         sleep 15
