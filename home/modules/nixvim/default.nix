@@ -219,6 +219,7 @@
             "zig"
             "markdown"
             "markdown_inline"
+            "html" # leetcode.nvim question rendering
             "dockerfile"
             "helm"
           ];
@@ -674,6 +675,15 @@
       }
       {
         mode = "n";
+        key = "<leader>lc";
+        action = "<cmd>Leet<CR>";
+        options = {
+          desc = "LeetCode: open dashboard";
+          silent = true;
+        };
+      }
+      {
+        mode = "n";
         key = "<leader>gg";
         action = "<cmd>LazyGit<CR>";
         options = {
@@ -732,6 +742,124 @@
           silent = true;
         };
       }
+
+      # Go: generate `if err != nil { return ... }` for the current line.
+      # Versatile: detects the error variable name, reads the enclosing
+      # function's return types via treesitter, and emits correct zero values.
+      {
+        mode = "n";
+        key = "<leader>ce";
+        action.__raw = ''
+          function()
+            if vim.bo.filetype ~= "go" then
+              vim.notify("if-err: not a Go buffer", vim.log.levels.WARN)
+              return
+            end
+
+            local bufnr = vim.api.nvim_get_current_buf()
+            local ts = vim.treesitter
+
+            -- 1) Current line context.
+            local row = vim.api.nvim_win_get_cursor(0)[1] -- 1-based
+            local line = vim.api.nvim_get_current_line()
+            local indent = line:match("^%s*") or ""
+
+            -- 2) Detect the error variable on the LHS of the assignment.
+            local function detect_err_name(l)
+              local lhs = l:match("^%s*(.-)%s*:?=")
+              if lhs then
+                local names = {}
+                for name in lhs:gmatch("[%w_%.]+") do
+                  names[#names + 1] = name
+                end
+                for k = #names, 1, -1 do
+                  if names[k]:match("[eE]rr%w*$") or names[k]:match("^[eE]rr") then
+                    return names[k]
+                  end
+                end
+                if #names > 0 then return names[#names] end
+              end
+              return "err"
+            end
+            local err_name = detect_err_name(line)
+
+            -- 3) Zero value for a given type node.
+            local numeric = {
+              int = true, int8 = true, int16 = true, int32 = true, int64 = true,
+              uint = true, uint8 = true, uint16 = true, uint32 = true, uint64 = true,
+              uintptr = true, byte = true, rune = true,
+              float32 = true, float64 = true, complex64 = true, complex128 = true,
+            }
+            local function node_text(n) return ts.get_node_text(n, bufnr) end
+            local function zero_value(tn)
+              if tn == nil then return "nil" end
+              local t = tn:type()
+              if t == "pointer_type" or t == "slice_type" or t == "map_type"
+                or t == "channel_type" or t == "function_type"
+                or t == "interface_type" then
+                return "nil"
+              elseif t == "type_identifier" then
+                local txt = node_text(tn)
+                if txt == "error" then return err_name
+                elseif txt == "string" then return '""'
+                elseif txt == "bool" then return "false"
+                elseif txt == "any" then return "nil"
+                elseif numeric[txt] then return "0"
+                else return "*new(" .. txt .. ")" end
+              else
+                -- qualified_type, generic_type, struct_type, etc.
+                return "*new(" .. node_text(tn) .. ")"
+              end
+            end
+
+            -- 4) Walk up to the enclosing function and read its result types.
+            local node = ts.get_node()
+            while node and not (node:type() == "function_declaration"
+              or node:type() == "method_declaration"
+              or node:type() == "func_literal") do
+              node = node:parent()
+            end
+
+            local returns = {}
+            if node then
+              local result = node:field("result")[1]
+              if result then
+                if result:type() == "parameter_list" then
+                  for child in result:iter_children() do
+                    if child:type() == "parameter_declaration" then
+                      local tn = child:field("type")[1]
+                      local count = math.max(#child:field("name"), 1)
+                      for _ = 1, count do
+                        returns[#returns + 1] = zero_value(tn)
+                      end
+                    end
+                  end
+                else
+                  returns[#returns + 1] = zero_value(result)
+                end
+              end
+            end
+
+            -- 5) Build and insert the block.
+            local ret = (#returns == 0) and "return"
+              or ("return " .. table.concat(returns, ", "))
+            local body_indent = indent .. "\t"
+            local block = {
+              indent .. "if " .. err_name .. " != nil {",
+              body_indent .. ret,
+              indent .. "}",
+            }
+            vim.api.nvim_buf_set_lines(bufnr, row, row, false, block)
+
+            -- 6) Land on the return line for quick edits.
+            vim.api.nvim_win_set_cursor(0, { row + 2, #body_indent })
+          end
+        '';
+        options = {
+          desc = "Go: insert if err != nil block";
+          silent = true;
+        };
+      }
     ];
 
     extraPlugins = with pkgs.vimPlugins; [
@@ -740,11 +868,24 @@
       plenary-nvim
       nui-nvim
       bufdelete-nvim
+      leetcode-nvim
       # Additional snippet sources
       vim-snippets # Contains k8s, ansible, systemd snippets
     ];
 
     extraConfigLua = ''
+                  -- leetcode.nvim: open with `:Leet` or `nvim leetcode.nvim`
+                  require("leetcode").setup({
+                    arg = "leetcode.nvim",
+                    lang = "go",
+                    storage = {
+                      home = "/home/misha/leetcode",
+                      cache = vim.fn.stdpath("cache") .. "/leetcode",
+                    },
+                    picker = { provider = "fzf-lua" },
+                    image_support = false,
+                  })
+
                   local lspconfig = require('lspconfig')
                   lspconfig["rust_analyzer"].setup({
                      cmd = { "rust-analyzer" },
