@@ -131,102 +131,18 @@
     };
   };
 
-  # Happ - cross-platform proxy utility built on Xray core (VLESS/Reality,
-  # VMess, Trojan, Shadowsocks). Not in nixpkgs; packaged from the upstream
-  # .deb. Bundles its own Qt6 + Xray/sing-box, so we only patch the prebuilt
-  # ELF binaries against the bundled libs plus a few system libs.
-  happ = pkgs.stdenv.mkDerivation rec {
-    pname = "happ";
-    version = "2.17.1";
-
-    src = pkgs.fetchurl {
-      url = "https://github.com/Happ-proxy/happ-desktop/releases/download/${version}/Happ.linux.x64.deb";
-      sha256 = "1gm1zjjvfvnmqcsp03x05i9kkidr9i6ccsih4m2zzinlshlybfg5";
-    };
-
-    nativeBuildInputs = with pkgs; [
-      dpkg
-      autoPatchelfHook
-      makeWrapper
-    ];
-
-    buildInputs = with pkgs; [
-      stdenv.cc.cc.lib # libstdc++, libgcc_s
-      libglvnd # libGL, libGLX, libEGL, libOpenGL
-      fontconfig
-      freetype
-      libgpg-error
-      libgcrypt
-      zlib
-      openssl # libssl/libcrypto, dlopen'd by Qt tls backend
-      e2fsprogs # libcom_err
-      xorg.libX11
-      xorg.libxcb
-      xorg.libXau
-      xorg.libXdmcp
-      libxkbcommon
-    ];
-
-    # Only used by the deprecated wl-shell protocol plugin; modern compositors
-    # (Hyprland) use xdg-shell, which has its own bundled plugin.
-    autoPatchelfIgnoreMissingDeps = ["libQt6WlShellIntegration.so.6"];
-
-    unpackPhase = ''
-      runHook preUnpack
-      dpkg-deb -x $src .
-      runHook postUnpack
-    '';
-
-    dontConfigure = true;
-    dontBuild = true;
-
-    installPhase = ''
-      runHook preInstall
-
-      mkdir -p $out
-      cp -r opt $out/opt
-      chmod -R u+w $out/opt
-
-      # Qt's openssl TLS backend dlopen's libssl/libcrypto by soname; drop them
-      # into the bundled lib dir so the plugin's RUNPATH resolves them.
-      ln -s ${pkgs.openssl.out}/lib/libssl.so.3 $out/opt/happ/lib/libssl.so.3
-      ln -s ${pkgs.openssl.out}/lib/libcrypto.so.3 $out/opt/happ/lib/libcrypto.so.3
-
-      mkdir -p $out/share
-      cp -r usr/share/* $out/share/ 2>/dev/null || true
-
-      # Launcher: exec the real binary so Qt's applicationDirPath resolves to
-      # $out/opt/happ/bin and qt.conf finds the bundled plugins/libs.
-      makeWrapper $out/opt/happ/bin/Happ $out/bin/happ \
-        --unset QT_PLUGIN_PATH \
-        --unset QT_QPA_PLATFORM_PLUGIN_PATH \
-        --unset QML2_IMPORT_PATH
-
-      ln -s $out/opt/happ/bin/happd $out/bin/happd
-
-      mkdir -p $out/share/applications
-      if [ -f usr/share/applications/Happ.desktop ]; then
-        substitute usr/share/applications/Happ.desktop $out/share/applications/Happ.desktop \
-          --replace /opt/happ/bin/Happ $out/bin/happ
-      fi
-
-      runHook postInstall
-    '';
-
-    meta = with lib; {
-      description = "Happ - cross-platform proxy utility built on Xray core (VLESS/Reality, VMess, Trojan, Shadowsocks)";
-      homepage = "https://www.happ.su";
-      license = licenses.unfree;
-      platforms = ["x86_64-linux"];
-      mainProgram = "happ";
-    };
-  };
 in {
   imports = [
     ./hardware-configuration.nix
+    ./modules/happ/happ-module.nix
   ];
 
   nixpkgs.config.allowUnfree = true; # or see per-pkg predicate below
+
+  # Happ proxy client via the vendored happ-nixos community module
+  # (modules/happ). Replaces the previous hand-rolled derivation + happd unit;
+  # this variant adds the HWID fix (dbus machine-id link) that the old one lacked.
+  services.happ.enable = true;
   boot.loader.systemd-boot.enable = true;
   boot.kernel.sysctl = {
     "kernel.perf_event_paranoid" = -1;
@@ -371,26 +287,6 @@ in {
   #   };
   # };
 
-  # Happ process-control daemon. Runs as root so sing-box can create the TUN
-  # device and routes (CAP_NET_ADMIN). The Happ GUI (run as your user) connects
-  # to it over /tmp/happd.sock (created world-accessible, mode 0666). This
-  # replaces Happ's own pkexec-based self-install of the unit, which would
-  # otherwise write a /etc unit pointing at a store path that changes on rebuild.
-  systemd.services.happd = {
-    description = "Happ Process Control Daemon";
-    after = ["network.target"];
-    wantedBy = ["multi-user.target"];
-    path = with pkgs; [iproute2 iptables nftables];
-    serviceConfig = {
-      Type = "simple";
-      ExecStart = "${happ}/opt/happ/bin/happd";
-      Restart = "on-failure";
-      RestartSec = "5s";
-      TimeoutStopSec = "10s";
-      KillMode = "mixed";
-      KillSignal = "SIGTERM";
-    };
-  };
   #
   # # Zapret DPI bypass
   # services.zapret = {
@@ -731,7 +627,6 @@ in {
     docker-compose
     typst
     hiddify-app
-    happ
     throne
     v2rayn
     xray
