@@ -181,6 +181,9 @@ in {
     LC_TIME = "en_GB.UTF-8";
   };
 
+  # NixOS pins bluetooth.service to X-RestartIfChanged=false so rebuilds don't
+  # drop live connections. Changing `settings` below therefore requires a
+  # manual `systemctl restart bluetooth` to take effect.
   hardware.bluetooth = {
     enable = true;
     powerOnBoot = true;
@@ -188,12 +191,13 @@ in {
       General = {
         Experimental = true;
         FastConnectable = true;
-        AutoConnect = true;
-        ReconnectAttempts = 7;
-        ReconnectIntervals = "1, 2, 4, 8, 16, 32, 64";
       };
+      # ReconnectAttempts/ReconnectIntervals are [Policy] keys; BlueZ silently
+      # discards them from [General].
       Policy = {
         AutoEnable = true;
+        ReconnectAttempts = 7;
+        ReconnectIntervals = "1, 2, 4, 8, 16, 32, 64";
       };
     };
   };
@@ -443,25 +447,6 @@ in {
 
   # Enable ssh-agent system service
   programs.ssh.startAgent = true;
-
-  # Auto-connect to bluetooth headset
-  systemd.services.bluetooth-auto-connect = {
-    description = "Auto-connect to bluetooth headset";
-    after = ["bluetooth.service"];
-    wants = ["bluetooth.service"];
-    wantedBy = ["multi-user.target"];
-    serviceConfig = {
-      Type = "simple";
-      Restart = "always";
-      RestartSec = "30";
-      ExecStart = "${pkgs.writeShellScript "bluetooth-auto-connect" ''
-        while true; do
-          ${pkgs.bluez}/bin/bluetoothctl connect 58:18:62:38:A8:69
-          sleep 1
-        done
-      ''}";
-    };
-  };
 
   # Keep a saddr-based bypass at the top of sing-box's prerouting chain so
   # libvirt VM traffic (10.0.0.0/23) and in-cluster K8s traffic (pod CIDR
