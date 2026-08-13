@@ -352,6 +352,36 @@
     };
   };
 
+  # Frametime overlay and logger, used to measure tuning changes rather than
+  # guess at them. Add `mangohud %command%` to a game's Steam launch options.
+  # Shift_L+F2 starts/stops a log, Shift_R+F12 toggles the overlay.
+  programs.mangohud = {
+    enable = true;
+    settings = {
+      fps = true;
+      frametime = true;
+      frame_timing = true;
+      # Average plus 1% and 0.1% lows - teamfight feel tracks the lows, not the
+      # average, so these are the numbers worth comparing between runs.
+      fps_metrics = "avg,0.01,0.001";
+      cpu_stats = true;
+      cpu_temp = true;
+      cpu_power = true;
+      cpu_mhz = true;
+      gpu_stats = true;
+      gpu_temp = true;
+      gpu_power = true;
+      vram = true;
+      ram = true;
+      output_folder = "/home/misha/mangohud-logs";
+      log_duration = 120;
+      toggle_logging = "Shift_L+F2";
+      toggle_hud = "Shift_R+F12";
+      position = "top-left";
+      font_size = 20;
+    };
+  };
+
   xdg.desktopEntries.zen = {
     name = "Zen Browser";
     genericName = "Web Browser";

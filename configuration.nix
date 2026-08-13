@@ -219,6 +219,16 @@ in {
     alsa.enable = true;
     pulse.enable = true;
     wireplumber.enable = true;
+    # Hide the GPU HDMI audio device (c6:00.1) - it flaps with monitor DPMS
+    # and makes Discord raise its "switch audio device" prompt
+    wireplumber.extraConfig."51-disable-hdmi-audio" = {
+      "monitor.alsa.rules" = [
+        {
+          matches = [ { "device.name" = "alsa_card.pci-0000_c6_00.1"; } ];
+          actions.update-props."device.disabled" = true;
+        }
+      ];
+    };
   };
 
   # XDG portals (Hyprland portal is key for file pickers, screen share)
@@ -243,12 +253,40 @@ in {
   programs.steam = {
     enable = true;
     remotePlay.openFirewall = true;
+    # Adds GE-Proton to the compatibility-tool list. Select it per game via
+    # Properties -> Compatibility in Steam; Proton Experimental stays available.
+    extraCompatPackages = [pkgs.proton-ge-bin];
   };
   programs.gamemode.enable = true;
 
   # Enable WiFi support
   hardware.wirelessRegulatoryDatabase = true;
   hardware.enableRedistributableFirmware = true;
+
+  # The MKG MKF25F240 ships a malformed EDID: the Display Range Limits
+  # descriptor sets its flags byte to 0x00 (default GTF) instead of 0x01
+  # (range limits only), so get_monitor_range() in drm_edid.c discards the
+  # 48-280 Hz range and amdgpu reports vrr_capable=0. This EDID is byte
+  # identical to the monitor's own except for that flag and the checksum.
+  # Remove this override if a different monitor is ever attached to DP-3.
+  hardware.firmware = [
+    (pkgs.runCommand "mkg-edid-vrrfix" { } ''
+      mkdir -p $out/lib/firmware/edid
+      cp ${./firmware/mkg-vrr.bin} $out/lib/firmware/edid/mkg-vrr.bin
+    '')
+  ];
+  boot.kernelParams = ["drm.edid_firmware=DP-3:edid/mkg-vrr.bin"];
+
+  # Speculative-execution mitigations cost real framerate in CPU-bound games.
+  # This box runs Zen 4, which pays for Safe RET (spec_rstack_overflow) and TSA
+  # buffer clears, and vmscape's IBPB-on-userspace-exit lands hardest on the
+  # syscall-heavy Proton/DXVK path. Disabling them system-wide is a bad trade
+  # here because this machine also holds work VPN and cluster credentials, so
+  # it gets its own boot entry instead: choose "NixOS - gaming" in the
+  # bootloader to play, and the default entry stays fully mitigated.
+  specialisation.gaming.configuration = {
+    boot.kernelParams = ["mitigations=off"];
+  };
 
   hardware.uinput.enable = true;
 
