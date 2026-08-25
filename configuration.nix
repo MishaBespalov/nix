@@ -268,14 +268,17 @@ in {
   # (range limits only), so get_monitor_range() in drm_edid.c discards the
   # 48-280 Hz range and amdgpu reports vrr_capable=0. This EDID is byte
   # identical to the monitor's own except for that flag and the checksum.
-  # Remove this override if a different monitor is ever attached to DP-3.
+  # Remove this override if a different monitor is ever attached to DP-1.
+  # NOTE: the connector name tracks whichever GPU drives the panel. On the
+  # iGPU it enumerated as DP-3; over the AG02 OCuLink dock it is DP-1 on the
+  # dGPU. Only the dGPU exposes a DP-1, so this target is unambiguous.
   hardware.firmware = [
     (pkgs.runCommand "mkg-edid-vrrfix" { } ''
       mkdir -p $out/lib/firmware/edid
       cp ${./firmware/mkg-vrr.bin} $out/lib/firmware/edid/mkg-vrr.bin
     '')
   ];
-  boot.kernelParams = ["drm.edid_firmware=DP-3:edid/mkg-vrr.bin"];
+  boot.kernelParams = ["drm.edid_firmware=DP-1:edid/mkg-vrr.bin"];
 
   # Speculative-execution mitigations cost real framerate in CPU-bound games.
   # This box runs Zen 4, which pays for Safe RET (spec_rstack_overflow) and TSA

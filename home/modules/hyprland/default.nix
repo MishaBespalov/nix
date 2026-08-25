@@ -39,8 +39,10 @@
       "$telegram" = "telegram-desktop";
       "$menu" = "wofi --show drun";
       monitor = [
-        "DP-3,1920x1080@280,0x0,1,vrr,1"
-        "HDMI-A-1,1920x1080@60,1920x0,1"
+        # Match by EDID description: the connector name changes depending on
+        # whether the panel hangs off the iGPU or the OCuLink eGPU.
+        "desc:MKG MKF25F240,1920x1080@280,0x0,1"
+        ",preferred,auto,1"
       ];
       input = {
         kb_layout = "us,ru";
@@ -64,6 +66,9 @@
       };
 
       general = {
+        # Required for the `immediate` windowrule below to do anything; without
+        # it tearing stays off and the rule is inert.
+        allow_tearing = true;
         gaps_in = 6;
         gaps_out = 12;
         border_size = 1;
