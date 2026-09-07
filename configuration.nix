@@ -397,7 +397,10 @@ in {
   services.greetd = {
     enable = true;
     settings.default_session = {
-      command = "Hyprland";
+      # start-hyprland, not Hyprland: 0.56 wants to be supervised by its
+      # watchdog process and warns on every launch when it is not
+      # ("Hyprland is being launched without start-hyprland").
+      command = "start-hyprland";
       user = "misha";
     };
   };

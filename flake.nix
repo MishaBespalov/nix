@@ -65,7 +65,24 @@ zen-browser = {
           home-manager.nixosModules.home-manager
           {
             # Apply rust-overlay to the system packages
-            nixpkgs.overlays = [ rust-overlay.overlays.default ];
+            nixpkgs.overlays = [
+              rust-overlay.overlays.default
+
+              # Hyprland from unstable. 25.05 pins 0.49.0 (May 2025), whose
+              # aquamarine tears down an already-freed page-flip event source
+              # when an atomic commit fails, segfaulting the whole compositor.
+              # Overriding here rather than at each use site keeps the
+              # compositor and its portal on the same version: the portal
+              # speaks Hyprland's private protocols, so the two must match.
+              # useGlobalPkgs is on, so home-manager picks this up as well.
+              (final: _prev: {
+                inherit
+                  (nixpkgs-unstable.legacyPackages.${final.system})
+                  hyprland
+                  xdg-desktop-portal-hyprland
+                  ;
+              })
+            ];
             
             home-manager = {
               useGlobalPkgs = true;
