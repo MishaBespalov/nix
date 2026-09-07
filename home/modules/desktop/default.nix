@@ -280,7 +280,33 @@
     '';
   };
 
-  services.hypridle.enable = true;
+  # hypridle aborts on startup when it cannot find a config, and systemd keeps
+  # restarting it: the crashed boot on Aug 31 hit 10,684 restarts, one coredump
+  # every 10s, and idle-lock never worked. home-manager only writes
+  # ~/.config/hypr/hypridle.conf when `settings` is non-empty, so `enable` alone
+  # is not enough. Absolute store paths because the user unit has a bare PATH.
+  services.hypridle = {
+    enable = true;
+    settings = {
+      general = {
+        lock_cmd = "${pkgs.procps}/bin/pidof hyprlock || ${pkgs.hyprlock}/bin/hyprlock";
+        before_sleep_cmd = "${pkgs.systemd}/bin/loginctl lock-session";
+        after_sleep_cmd = "${pkgs.hyprland}/bin/hyprctl dispatch dpms on";
+      };
+
+      listener = [
+        {
+          timeout = 600; # 10 min -> lock
+          on-timeout = "${pkgs.systemd}/bin/loginctl lock-session";
+        }
+        {
+          timeout = 900; # 15 min -> screen off
+          on-timeout = "${pkgs.hyprland}/bin/hyprctl dispatch dpms off";
+          on-resume = "${pkgs.hyprland}/bin/hyprctl dispatch dpms on";
+        }
+      ];
+    };
+  };
 
   programs.hyprlock = {
     enable = true;
