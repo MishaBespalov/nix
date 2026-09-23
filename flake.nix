@@ -31,6 +31,9 @@ zen-browser = {
     # Note: hunk pins its own (newer) nixpkgs for its build tooling (bun2nix
     # needs zig_0_15, absent from 25.05), so don't make it follow ours.
     hunk.url = "github:modem-dev/hunk";
+
+    # nixpkgs-unstable lags upstream releases, so take tuicr from its own flake.
+    tuicr.url = "github:agavra/tuicr";
   };
 
   outputs = {
