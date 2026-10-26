@@ -156,6 +156,9 @@ in {
   # this variant adds the HWID fix (dbus machine-id link) that the old one lacked.
   services.happ.enable = true;
   boot.loader.systemd-boot.enable = true;
+  # Every generation pins its full closure; without a cap they piled up
+  # past a thousand and held ~150G+ of the store alive.
+  boot.loader.systemd-boot.configurationLimit = 10;
   boot.kernel.sysctl = {
     "kernel.perf_event_paranoid" = -1;
     "kernel.kptr_restrict" = 0;
@@ -703,5 +706,11 @@ in {
   ];
 
   nix.settings.experimental-features = ["nix-command" "flakes"];
+  nix.settings.auto-optimise-store = true;
+  nix.gc = {
+    automatic = true;
+    dates = "weekly";
+    options = "--delete-older-than 14d";
+  };
   system.stateVersion = "25.05";
 }
