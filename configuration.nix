@@ -32,11 +32,11 @@
 
   throne = pkgs.stdenv.mkDerivation rec {
     pname = "throne";
-    version = "1.1.2";
+    version = "1.3.0-beta.3";
 
     src = pkgs.fetchurl {
       url = "https://github.com/throneproj/Throne/releases/download/${version}/Throne-${version}-linux-amd64.zip";
-      sha256 = "sha256-GYDlyCyPxyeUtHPxvy5KIGJF/kC8zlLN5h3GBoH0dgM=";
+      sha256 = "sha256-kRBSMklqWLXABX5MEVLvDwW2ZLw/OP0Hj8ybSa1oxrk=";
     };
 
     nativeBuildInputs = with pkgs; [
@@ -79,24 +79,36 @@
       DATA_DIR="\$HOME/.local/share/throne"
       STORE_DIR="$out/share/throne"
 
-      # Copy app to writable location if not present or outdated
-      if [ ! -f "\$DATA_DIR/Throne" ] || [ "\$STORE_DIR/Throne" -nt "\$DATA_DIR/Throne" ]; then
+      # Copy app to writable location when the store path changes. Store files
+      # all have mtime 1970, so an -nt comparison never detects upgrades.
+      if [ "\$(cat "\$DATA_DIR/.store-path" 2>/dev/null)" != "\$STORE_DIR" ]; then
           mkdir -p "\$DATA_DIR"
-          cp -r "\$STORE_DIR"/* "\$DATA_DIR"/
-          chmod -R u+w "\$DATA_DIR"
+          # Remove app files the previous version shipped but this one does not.
+          # Installs predating the manifest shipped a root-owned setuid "Core",
+          # which the directory owner can still unlink. config/ is never listed.
+          if [ -f "\$DATA_DIR/.store-manifest" ]; then
+              previous="\$(cat "\$DATA_DIR/.store-manifest")"
+          else
+              previous="Core"
+          fi
+          for name in \$previous; do
+              if [ ! -e "\$STORE_DIR/\$name" ]; then
+                  rm -rf "\$DATA_DIR/\$name"
+              fi
+          done
+          for entry in "\$STORE_DIR"/*; do
+              name="\$(basename "\$entry")"
+              cp -rf "\$entry" "\$DATA_DIR/"
+              chmod -R u+w "\$DATA_DIR/\$name"
+          done
+          ls "\$STORE_DIR" > "\$DATA_DIR/.store-manifest"
+          echo "\$STORE_DIR" > "\$DATA_DIR/.store-path"
       fi
 
       cd "\$DATA_DIR"
       export LD_LIBRARY_PATH="${pkgs.openssl.out}/lib:\$LD_LIBRARY_PATH"
       export SHELL=/run/current-system/sw/bin/bash
-      exec ${pkgs.proxychains-ng}/bin/proxychains4 -f ${pkgs.writeText "proxychains.conf" ''
-        localnet 127.0.0.0/255.0.0.0
-        localnet 10.0.0.0/255.0.0.0
-        localnet 172.16.0.0/255.240.0.0
-        localnet 192.168.0.0/255.255.0.0
-        [ProxyList]
-        socks5 127.0.0.1 1080
-      ''} "\$DATA_DIR/Throne" "\$@"
+      exec "\$DATA_DIR/Throne" "\$@"
       WRAPPER
             chmod +x $out/bin/throne
     '';
