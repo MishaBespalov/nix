@@ -424,11 +424,10 @@
       gtk-tabs-location = "bottom";
       gtk-custom-css = "/home/misha/nixos-dotfiles/home/modules/shell/ghostty-gitlab-tabs.css";
 
-      custom-shader = [
-        "shaders/sonic_boom_cursor.glsl"
-        "shaders/cursor_warp.glsl"
-      ];
-      custom-shader-animation = true;
+      # No animated cursor shaders: Ghostty drives shader animation from a
+      # hardcoded 8ms timer (~125fps, src/renderer/Thread.zig DRAW_INTERVAL),
+      # which on the 280Hz panel lands on an uneven 2-3 vblank cadence and
+      # visibly judders. Without them it only redraws on content change.
 
       # Replicate Zellij keybinds using Ghostty functionality
       keybind = [
