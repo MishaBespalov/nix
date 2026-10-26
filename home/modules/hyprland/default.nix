@@ -126,49 +126,6 @@
         hide_on_touch = true;
       };
 
-      # Steam games run as floating XWayland windows sized over the screen;
-      # without real fullscreen they lose keyboard focus while the game keeps
-      # the pointer grab (mouse works, keys dead). Force proper fullscreen.
-      #
-      # Deliberately no `immediate` (tearing) rule, and no general:allow_tearing
-      # to back it. Tearing made Hyprland 0.49 ask for async page flips that
-      # amdgpu rejected with EINVAL on every frame; the page-flip event then
-      # never arrived and aquamarine tore down an already-freed event source,
-      # segfaulting the compositor mid-match. Killed the session three times in
-      # Overwatch (Aug 25, 27, 31). On a 280 Hz panel with FreeSync the latency
-      # tearing would have bought back is not worth it.
-      # 0.56 rule grammar: comma-separated `name value` fields, matchers
-      # prefixed with `match:`, effects bare. The old `fullscreen, class:...`
-      # form parses as an effect with no value and is rejected outright.
-      windowrule = [
-        "fullscreen true, match:class ^(steam_app_\\d+)$"
-
-        # Cairn (Hearthstone tracker) overlay panels. A Wayland client cannot
-        # place or raise itself and upstream only ships KWin rules, so float
-        # everything, and keep the in-game panels ("Cairn · ...") pinned,
-        # undecorated and from taking focus off the game when they appear.
-        "float true, match:class ^(cairn)$"
-        "pin true, match:class ^(cairn)$, match:title ^(Cairn · .*)$"
-        "no_initial_focus true, match:class ^(cairn)$, match:title ^(Cairn · .*)$"
-        "no_shadow true, match:class ^(cairn)$, match:title ^(Cairn · .*)$"
-        "border_size 0, match:class ^(cairn)$, match:title ^(Cairn · .*)$"
-        "move (monitor_w-window_w-20) 120, match:class ^(cairn)$, match:title ^(Cairn · deck)$"
-        "move 20 120, match:class ^(cairn)$, match:title ^(Cairn · adversaire)$"
-        # The small widgets all open stacked at the screen centre otherwise.
-        # Positions are for the 1920x1080 panel.
-        "move 770 95, match:class ^(cairn)$, match:title ^(Cairn · main adverse)$"
-        "move 20 700, match:class ^(cairn)$, match:title ^(Cairn · compteurs)$"
-        "move 1400 590, match:class ^(cairn)$, match:title ^(Cairn · chrono)$"
-        "move 1230 770, match:class ^(cairn)$, match:title ^(Cairn · mes dégâts)$"
-        "move 800 210, match:class ^(cairn)$, match:title ^(Cairn · dégâts adverses)$"
-
-        # `hearthstone` runs the game and HDT inside a rootful Xwayland (see
-        # the desktop module); its window gets its own workspace and must be
-        # fullscreen, or tiling shrinks it and crops the 1920x1080 X screen.
-        "workspace 9, match:class ^(org.freedesktop.Xwayland)$"
-        "fullscreen true, match:class ^(org.freedesktop.Xwayland)$"
-      ];
-
       # Auto-start applications in specific workspaces
       exec-once = [
         # Start waybar

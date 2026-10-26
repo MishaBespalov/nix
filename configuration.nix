@@ -259,20 +259,7 @@ in {
   # (and are readable by the gtk portal -> Chromium/Vivaldi dark native menus).
   programs.dconf.enable = true;
 
-  hardware.graphics = {
-    enable = true;
-    enable32Bit = true; # 32-bit Vulkan/GL, required by Steam and Proton games
-  };
-
-  # Gaming (Overwatch 2 via Steam + Proton)
-  programs.steam = {
-    enable = true;
-    remotePlay.openFirewall = true;
-    # Adds GE-Proton to the compatibility-tool list. Select it per game via
-    # Properties -> Compatibility in Steam; Proton Experimental stays available.
-    extraCompatPackages = [pkgs.proton-ge-bin];
-  };
-  programs.gamemode.enable = true;
+  hardware.graphics.enable = true;
 
   # Enable WiFi support
   hardware.wirelessRegulatoryDatabase = true;
@@ -293,17 +280,8 @@ in {
       cp ${./firmware/mkg-vrr.bin} $out/lib/firmware/edid/mkg-vrr.bin
     '')
   ];
-  # Speculative-execution mitigations cost real framerate in CPU-bound games.
-  # This box runs Zen 4, which pays for Safe RET (spec_rstack_overflow) and TSA
-  # buffer clears, and vmscape's IBPB-on-userspace-exit lands hardest on the
-  # syscall-heavy Proton/DXVK path. These used to live in a `gaming`
-  # specialisation so the default entry stayed fully mitigated, but the
-  # two-entry boot menu was more friction than it was worth. Now off
-  # system-wide, which also means the work VPN and cluster credentials on this
-  # box run unmitigated.
   boot.kernelParams = [
     "drm.edid_firmware=DP-1:edid/mkg-vrr.bin"
-    "mitigations=off"
   ];
 
   hardware.uinput.enable = true;
@@ -629,10 +607,6 @@ in {
   # Bypassed destinations:
   #   - harbor-cloud.timeweb.net: corp registry
   #   - cr-internal.twcstorage.ru: Timeweb Cloud container registry
-  #   - bnxp*.vivox.com: Blizzard voice chat (Vivox) login — fails with
-  #     error 5003 when routed through the proxy
-  #   - 85.236.96.0/21: Vivox media servers (RTP endpoints are negotiated
-  #     in-protocol, not via DNS, so the whole block goes direct)
   systemd.services.vpn-bypass-direct = {
     description = "Pin selected traffic to the physical gateway (bypass all VPNs)";
     after = ["network.target" "NetworkManager.service"];
@@ -644,8 +618,7 @@ in {
       RestartSec = 5;
     };
     script = ''
-      HOSTS="harbor-cloud.timeweb.net cr-internal.twcstorage.ru bnxp.vivox.com bnxp.www.vivox.com"
-      SUBNETS="85.236.96.0/21"
+      HOSTS="harbor-cloud.timeweb.net cr-internal.twcstorage.ru"
       TABLE=137
       PRIO=50
       while true; do
@@ -655,7 +628,7 @@ in {
         GW=""
         [ -n "$DEV" ] && GW=$(nmcli -g IP4.GATEWAY device show "$DEV")
         if [ -n "$DEV" ] && [ -n "$GW" ]; then
-          DESTS="$SUBNETS"
+          DESTS=""
           for host in $HOSTS; do
             DESTS="$DESTS $(getent ahostsv4 "$host" | awk '{print $1}' | sort -u | tr '\n' ' ')"
           done
