@@ -886,6 +886,10 @@
                     image_support = false,
                   })
 
+                  -- Server stderr is logged at ERROR, so anything above "off" still
+                  -- lets rust-analyzer grow lsp.log unbounded (it reached 13G).
+                  vim.lsp.set_log_level("off")
+
                   local lspconfig = require('lspconfig')
                   lspconfig["rust_analyzer"].setup({
                      cmd = { "rust-analyzer" },
