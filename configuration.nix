@@ -628,6 +628,7 @@ in {
   #
   # Bypassed destinations:
   #   - harbor-cloud.timeweb.net: corp registry
+  #   - cr-internal.twcstorage.ru: Timeweb Cloud container registry
   #   - bnxp*.vivox.com: Blizzard voice chat (Vivox) login — fails with
   #     error 5003 when routed through the proxy
   #   - 85.236.96.0/21: Vivox media servers (RTP endpoints are negotiated
@@ -643,7 +644,7 @@ in {
       RestartSec = 5;
     };
     script = ''
-      HOSTS="harbor-cloud.timeweb.net bnxp.vivox.com bnxp.www.vivox.com"
+      HOSTS="harbor-cloud.timeweb.net cr-internal.twcstorage.ru bnxp.vivox.com bnxp.www.vivox.com"
       SUBNETS="85.236.96.0/21"
       TABLE=137
       PRIO=50
