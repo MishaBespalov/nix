@@ -142,6 +142,25 @@
       # form parses as an effect with no value and is rejected outright.
       windowrule = [
         "fullscreen true, match:class ^(steam_app_\\d+)$"
+
+        # Cairn (Hearthstone tracker) overlay panels. A Wayland client cannot
+        # place or raise itself and upstream only ships KWin rules, so float
+        # everything, and keep the in-game panels ("Cairn · ...") pinned,
+        # undecorated and from taking focus off the game when they appear.
+        "float true, match:class ^(cairn)$"
+        "pin true, match:class ^(cairn)$, match:title ^(Cairn · .*)$"
+        "no_initial_focus true, match:class ^(cairn)$, match:title ^(Cairn · .*)$"
+        "no_shadow true, match:class ^(cairn)$, match:title ^(Cairn · .*)$"
+        "border_size 0, match:class ^(cairn)$, match:title ^(Cairn · .*)$"
+        "move (monitor_w-window_w-20) 120, match:class ^(cairn)$, match:title ^(Cairn · deck)$"
+        "move 20 120, match:class ^(cairn)$, match:title ^(Cairn · adversaire)$"
+        # The small widgets all open stacked at the screen centre otherwise.
+        # Positions are for the 1920x1080 panel.
+        "move 770 95, match:class ^(cairn)$, match:title ^(Cairn · main adverse)$"
+        "move 20 700, match:class ^(cairn)$, match:title ^(Cairn · compteurs)$"
+        "move 1400 590, match:class ^(cairn)$, match:title ^(Cairn · chrono)$"
+        "move 1230 770, match:class ^(cairn)$, match:title ^(Cairn · mes dégâts)$"
+        "move 800 210, match:class ^(cairn)$, match:title ^(Cairn · dégâts adverses)$"
       ];
 
       # Auto-start applications in specific workspaces

@@ -5,6 +5,7 @@
   ...
 }: {
   imports = [
+    ./home/modules/cairn
     ./home/modules/common
     ./home/modules/desktop
     ./home/modules/git
