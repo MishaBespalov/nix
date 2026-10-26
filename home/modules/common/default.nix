@@ -51,7 +51,9 @@ in {
       telegram-desktop
       whatsapp-for-linux
       kdePackages.dolphin
-      spotify
+      # Spotify from unstable: 25.05 ships 1.2.59, which segfaults on startup.
+      # legacyPackages ignores allowUnfree, so import with our config.
+      (import inputs.nixpkgs-unstable { inherit (pkgs) system config; }).spotify
       nixpkgs-fmt
       inputs.nixpkgs-unstable.legacyPackages.${pkgs.system}.nodejs_24
       gcc
