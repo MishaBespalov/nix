@@ -161,6 +161,12 @@
         "move 1400 590, match:class ^(cairn)$, match:title ^(Cairn · chrono)$"
         "move 1230 770, match:class ^(cairn)$, match:title ^(Cairn · mes dégâts)$"
         "move 800 210, match:class ^(cairn)$, match:title ^(Cairn · dégâts adverses)$"
+
+        # `hearthstone` runs the game and HDT inside a rootful Xwayland (see
+        # the desktop module); its window gets its own workspace and must be
+        # fullscreen, or tiling shrinks it and crops the 1920x1080 X screen.
+        "workspace 9, match:class ^(org.freedesktop.Xwayland)$"
+        "fullscreen true, match:class ^(org.freedesktop.Xwayland)$"
       ];
 
       # Auto-start applications in specific workspaces
